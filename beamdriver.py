@@ -260,7 +260,7 @@ class SimDriver(Driver):
         names = [element.name for element in self.sim_beamline.elements]
         if tcav_name in names:
             index_num = names.index(tcav_name)
-            phase_in_radians = phase_in_degrees * (math.pi/180)
+            phase_in_radians = phase_in_degrees * (1/360)
             self.sim_beamline.elements[index_num].phase= torch.tensor(phase_in_radians)
             print(f"""TCAV in segment with name {tcav_name}
                    set to {phase_in_degrees } degrees""")
@@ -271,7 +271,7 @@ class SimDriver(Driver):
         if tcav_name in names:
             index_num = names.index(tcav_name)
             phase_in_radians = self.sim_beamline.elements[index_num].phase.item()
-            phase_in_degrees = phase_in_radians * (180/math.pi)
+            phase_in_degrees = phase_in_radians * (360)
             print(f"Phase in degrees is {phase_in_degrees}")
         else:
             print(f"""Warning {tcav_name} not in Segment cannot retrieve the phase""")
