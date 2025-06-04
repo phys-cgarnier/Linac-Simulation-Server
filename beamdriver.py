@@ -6,6 +6,7 @@ import torch
 from lcls_tools.common.data.model_general_calcs import bdes_to_kmod, kmod_to_bdes
 from scipy.stats import cauchy
 import pprint
+import math
 # TODO: set defaults for all tcav enum pvs
 #  
 class SimDriver(Driver):
@@ -194,54 +195,11 @@ class SimDriver(Driver):
             length = self.sim_beamline.elements[index_num].length.item()
             energy = self.sim_beam.energy.item()
             quad_value = kmod_to_bdes(e_tot= energy, effective_length = length, k = kmod)
-            print(f"kmod is {kmod} with quad_value {quad_value}")
+            print(f"""Quad in segment with name {quad_name} kmod is {kmod} with quad_value {quad_value}""")
         else:
             print(f"""Warning {quad_name} not in Segment""")
             quad_value = 0
         return quad_value
-    
-    def set_tcav_amplitude(self, tcav_name, megavolts_amplitude):
-        """ Set transverse cavity strength of simulation beamline takes Mega Volts and sets in Volts"""
-        names = [element.name for element in self.sim_beamline.elements]
-        if tcav_name in names:
-            index_num = names.index(tcav_name)
-            self.sim_beamline.elements[index_num].voltage = torch.tensor(megavolts_amplitude*1e6)
-            print(f"""TCAV in segment with name {tcav_name}
-                   set to {megavolts_amplitude*1e6 } volts""")
-            
-    def get_tcav_amplitude(self, tcav_name):
-        """Retrieve transverse cavity strength (MV) from the simulation beamline."""
-        names = [element.name for element in self.sim_beamline.elements]
-        if tcav_name in names:
-            index_num = names.index(tcav_name)
-            voltage_amplitude = self.sim_beamline.elements[index_num].voltage.item()
-            mega_voltage_amplitude = (voltage_amplitude/1e6)
-            print(f"Voltage is is {mega_voltage_amplitude}")
-        else:
-            print(f"""Warning {tcav_name} not in Segment""")
-            mega_voltage_amplitude = 0
-        return mega_voltage_amplitude
-
-    def set_tcav_phase(self, tcav_name, phase_in_degrees):
-        """ Set the phase of simulation beamline transverse cavity"""
-        names = [element.name for element in self.sim_beamline.elements]
-        if tcav_name in names:
-            index_num = names.index(tcav_name)
-            self.sim_beamline.elements[index_num].phase= torch.tensor(phase_in_degrees)
-            print(f"""TCAV in segment with name {tcav_name}
-                   set to {phase_in_degrees } degrees""")
-            
-    def get_tcav_phase(self, tcav_name):
-        """Retrieve the phase of the transverse cavity in degrees from the simulation beamline."""
-        names = [element.name for element in self.sim_beamline.elements]
-        if tcav_name in names:
-            index_num = names.index(tcav_name)
-            phase = self.sim_beamline.elements[index_num].phase.item()
-            print(f"Phase in degrees is {phase}")
-        else:
-            print(f"""Warning {tcav_name} not in Segment""")
-            phase = 0
-        return phase
 
     def get_screen_distribution(self, screen_name: str)-> list[float]:
         """Retrieves image from simulation beamline and adds noise, has 
@@ -275,6 +233,50 @@ class SimDriver(Driver):
             self.sim_beamline.elements[index_num].is_active = is_active_position
             print(f"set screen to position: {self.sim_beamline.elements[index_num].is_active}")
     
+    def set_tcav_amplitude(self, tcav_name, megavolts_amplitude):
+        """ Set transverse cavity strength of simulation beamline takes Mega Volts and sets in Volts"""
+        names = [element.name for element in self.sim_beamline.elements]
+        if tcav_name in names:
+            index_num = names.index(tcav_name)
+            self.sim_beamline.elements[index_num].voltage = torch.tensor(megavolts_amplitude*1e6)
+            print(f"""TCAV in segment with name {tcav_name}
+                   set to {megavolts_amplitude*1e6 } volts""")
+            
+    def get_tcav_amplitude(self, tcav_name):
+        """Retrieve transverse cavity strength (MV) from the simulation beamline."""
+        names = [element.name for element in self.sim_beamline.elements]
+        if tcav_name in names:
+            index_num = names.index(tcav_name)
+            voltage_amplitude = self.sim_beamline.elements[index_num].voltage.item()
+            mega_voltage_amplitude = (voltage_amplitude/1e6)
+            print(f"Voltage is is {mega_voltage_amplitude}")
+        else:
+            print(f"""Warning {tcav_name} not in Segment""")
+            mega_voltage_amplitude = 0
+        return mega_voltage_amplitude
+
+    def set_tcav_phase(self, tcav_name, phase_in_degrees):
+        """ Set the phase of simulation beamline transverse cavity"""
+        names = [element.name for element in self.sim_beamline.elements]
+        if tcav_name in names:
+            index_num = names.index(tcav_name)
+            phase_in_radians = phase_in_degrees * (math.pi/180)
+            self.sim_beamline.elements[index_num].phase= torch.tensor(phase_in_radians)
+            print(f"""TCAV in segment with name {tcav_name}
+                   set to {phase_in_degrees } degrees""")
+            
+    def get_tcav_phase(self, tcav_name):
+        """Retrieve the phase of the transverse cavity in degrees from the simulation beamline."""
+        names = [element.name for element in self.sim_beamline.elements]
+        if tcav_name in names:
+            index_num = names.index(tcav_name)
+            phase_in_radians = self.sim_beamline.elements[index_num].phase.item()
+            phase_in_degrees = phase_in_radians * (180/math.pi)
+            print(f"Phase in degrees is {phase_in_degrees}")
+        else:
+            print(f"""Warning {tcav_name} not in Segment cannot retrieve the phase""")
+            phase_in_degrees = 0
+        return phase_in_degrees
 
     def read(self, reason):
         #TODO: need logic for which screen is in and out, maybe if self.screen is out and other screen is in change
