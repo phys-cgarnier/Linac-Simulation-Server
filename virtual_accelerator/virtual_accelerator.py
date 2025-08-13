@@ -114,6 +114,7 @@ class VirtualAccelerator:
 
             # get the base pv name
             base_pv_name = ":".join(pv_name.split(":")[:3])
+            print(base_pv_name)
             attribute_name = ":".join(pv_name.split(":")[3:])
 
             # get the beam energy along the lattice
@@ -136,4 +137,4 @@ class VirtualAccelerator:
             else:
                 raise ValueError(f"Invalid PV base name: {base_pv_name}")
 
-        return values
+        return {name: ele.item() for name,ele in values.items()}

@@ -17,11 +17,11 @@ class FieldAccessor:
 
     def __call__(self, element, energy, value=None):
         if value is None:
-            return self.get(element)
+            return self.get(element,energy)
         else:
             if self.set is None:
                 raise ValueError("Cannot set value for.")
-            self.set(element, value)
+            self.set(element, energy, value)
 
 
 def get_magnetic_rigidity(energy):
@@ -31,6 +31,7 @@ def get_magnetic_rigidity(energy):
     return 33.356 * energy / 1e9
 
 # define mappings for different element types 
+
 # -- include conversions for cheetah attributes to SLAC EPICS attributes
 QUADRUPOLE_MAPPING = {
     "BCTRL": FieldAccessor(lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy), lambda e, energy, k1: setattr(e, "k1", k1 / get_magnetic_rigidity(energy) / e.length)),
@@ -53,8 +54,8 @@ TRANSVERSE_DEFLECTING_CAVITY_MAPPING = {
 }
 
 BPM_MAPPING = {
-    "XSCDT1H": FieldAccessor(lambda e: e.reading[0]),
-    "YSCDT1H": FieldAccessor(lambda e: e.reading[1]),
+    "X": FieldAccessor(lambda e, energy: e.reading[0]),
+    "Y": FieldAccessor(lambda e, energy: e.reading[1]),
 }
 
 SCREEN_MAPPING = {
