@@ -33,14 +33,15 @@ custom_pvs = {'VIRT:BEAM:EMITTANCES': {'type':'float', 'count': 2},
 }
 PVDB.update(custom_pvs)
 pprint.pprint(PVDB)
-
+mapping_file = 'virtual_accelerator/tests/resources/lcls_elements.csv'
 server = SimServer(PVDB)
 driver = SimDriver(
     server=server,
     screen=screen_name,
     devices=devices,
     particle_beam=incoming_beam,
-    lattice_file="lattices/diag0.json" # check that lattice file is actually real..
+    lattice_file="lattices/diag0bpm.json",
+    mapping_file=mapping_file
 )
 
 print('Starting simulated server')

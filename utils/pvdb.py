@@ -102,6 +102,15 @@ def create_pvdb(device: dict, **default_params) -> dict:
             }
             pvdb.update(tcav_params)
 
+        elif 'BPMS' in key:
+            bpms_params = {
+                get_pv('tmit'):{'type': 'float', 'value': 0.0, 'prec': 5},
+                get_pv('x'):{'type': 'float', 'value': 0.0, 'prec': 5},
+                get_pv('y'):{'type': 'float', 'value': 0.0, 'prec': 5},
+                
+            }
+            pvdb.update(bpms_params)
+
     return pvdb
 #TODO: make defaults more robust
 #TODO: ensure matching defaults are also passed to beamline.py correctly

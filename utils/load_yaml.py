@@ -29,6 +29,14 @@ def load_relevant_controls(yaml_file):
             relevant_controls[control_name]['pvs'] = info['controls_information']['PVs']
             relevant_controls[control_name]['metadata'] = info['metadata']
             relevant_controls[control_name]['madname'] = name.lower() 
+
+    for name, info in data.get('bpms', {}).items():
+        if info['metadata']['type'] == 'BPM':
+            control_name = info['controls_information']['control_name']
+            relevant_controls[control_name] = {}
+            relevant_controls[control_name]['pvs'] = info['controls_information']['PVs']
+            relevant_controls[control_name]['metadata'] = info['metadata']
+            relevant_controls[control_name]['madname'] = name.lower() 
     return relevant_controls
 
 #TODO: multiarea
