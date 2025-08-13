@@ -10,7 +10,7 @@ def create_pvdb(device: dict, **default_params) -> dict:
         def get_pv(name: str) -> str:
             return pvs.get(name, f'{key}:missing_{name}')
 
-        if 'QUAD' in key:
+        if any(name in key for name in ['QUAD','XCOR','YCOR']):
             quad_params = {
                 get_pv('bact'): {'type': 'float', 'value': 0.0, 'prec': 5, 'hopr': 20, 'lopr': -20, 'drvh': 20, 'drvl': -20},
                 get_pv('bctrl'): {'type': 'float', 'value': 0.0, 'prec': 5, 'hopr': 20, 'lopr': -20, 'drvh': 20, 'drvl': -20},

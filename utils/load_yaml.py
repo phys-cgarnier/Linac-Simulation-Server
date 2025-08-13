@@ -6,12 +6,12 @@ def load_relevant_controls(yaml_file):
     relevant_controls = {}  
     # Process magnets
     for name, info in data.get('magnets', {}).items():
-        if info['metadata']['type'] == 'QUAD':
+        if info['metadata']['type'] in ['QUAD','XCOR', 'YCOR']:
             control_name = info['controls_information']['control_name']
             relevant_controls[control_name] = {}
             relevant_controls[control_name]['pvs'] = info['controls_information']['PVs']
             relevant_controls[control_name]['metadata'] = info['metadata']
-            relevant_controls[control_name]['madname'] = name.lower() 
+            relevant_controls[control_name]['madname'] = name.lower()
     # Process screens
     for name, info in data.get('screens', {}).items():
         if info['metadata']['type'] == 'PROF':  # Assuming 'PROF' represents OTR
