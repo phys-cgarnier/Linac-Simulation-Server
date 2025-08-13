@@ -40,7 +40,7 @@ driver = SimDriver(
     screen=screen_name,
     devices=devices,
     particle_beam=incoming_beam,
-    lattice_file="lattices/diag0bpm.json",
+    lattice_file="lattices/new_diag0.json",
     mapping_file=mapping_file
 )
 
