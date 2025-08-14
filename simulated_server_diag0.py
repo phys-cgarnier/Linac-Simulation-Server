@@ -15,7 +15,7 @@ incoming_beam = ParticleBeam.from_twiss(
     emittance_y=torch.tensor(1e-7),
     energy=torch.tensor(90e6),
     num_particles=100000,
-    total_charge=torch.tensor(1e-9)
+    total_charge=torch.tensor(1)
 )
 
 #diag0_lattice = Segment.from_lattice_json("lattices/diag0_reconstruction.json")
