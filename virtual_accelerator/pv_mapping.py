@@ -59,11 +59,11 @@ BPM_MAPPING = {
 }
 
 SCREEN_MAPPING = {
-    "Image:ArrayData": FieldAccessor(lambda e: e.reading),
+    "Image:ArrayData": FieldAccessor(lambda e, energy: (e.reading).cpu().numpy().flatten().tolist()), #ridiculous
     "PNEUMATIC": "is_active",
-    "Image:ArraySize1_RBV": FieldAccessor(lambda e: e.resolution[0]),
-    "Image:ArraySize2_RBV": FieldAccessor(lambda e: e.resolution[1]),
-    "RESOLUTION": FieldAccessor(lambda e: e.pixel_size[0]),
+    "Image:ArraySize0_RBV": FieldAccessor(lambda e, energy: e.resolution[0]),
+    "Image:ArraySize1_RBV": FieldAccessor(lambda e, energy: e.resolution[1]),
+    "RESOLUTION": FieldAccessor(lambda e, energy: e.pixel_size[0]),
 }
 
 MAPPINGS = {
@@ -92,7 +92,6 @@ def access_cheetah_attribute(element, pv_attribute, energy, set_value=None):
     Returns:
         value: The corresponding Cheetah attribute value if `set_value` is None, otherwise sets the value and returns None.
     """
-
     element_type = type(element).__name__
     if element_type not in MAPPINGS:
         raise ValueError(f"Unsupported element type: {element_type}")
