@@ -24,6 +24,7 @@ class VirtualAccelerator:
 
         # do a first run to populate readings
         self.lattice.track(incoming=self.initial_beam_distribution)
+        print('done with initial tracking')
 
     def get_energy(self):
         """
@@ -34,6 +35,7 @@ class VirtualAccelerator:
             torch.zeros(1, 7), energy=self.initial_beam_distribution.energy
         )
         element_names = [e.name for e in self.lattice.elements]
+        print(dict(zip(element_names,self.lattice.get_beam_attrs_along_segment(('mu_x')),incoming=test_beam)))
         return dict(
             zip(
                 element_names,
@@ -47,8 +49,10 @@ class VirtualAccelerator:
         If `value` is True, the shutter is closed (no beam), otherwise it is open (beam present).
         """
         if value:
+            print('setting particle charges to zero')
             self.initial_beam_distribution.particle_charges = torch.tensor(0.0)
         else:
+            print('why am I here')
             self.initial_beam_distribution.particle_charges = (
                 self.initial_beam_distribution_charge
             )
@@ -73,7 +77,7 @@ class VirtualAccelerator:
 
             # get the beam energy along the lattice -- returns a dict of element names to energies
             beam_energy_along_lattice = self.get_energy()
-
+            print(beam_energy_along_lattice)
             # check if the pv_name is a control variable
             if base_pv_name in self.mapping:
                 # set the value in the virtual accelerator simulator
@@ -97,6 +101,7 @@ class VirtualAccelerator:
         # at the end of setting all PVs, run the simulation with the initial beam distribution
         # this will update all readings (screens, BPMs, etc.) in the lattice
         self.lattice.track(incoming=self.initial_beam_distribution)
+        print('tracked?')
 
     def get_pvs(self, pv_names: list):
         """
@@ -122,7 +127,9 @@ class VirtualAccelerator:
 
             # check if the pv_name is a control variable
             if base_pv_name in self.mapping:
+                print(f'{base_pv_name} in mapping')
                 element = getattr(self.lattice, self.mapping[base_pv_name].lower())
+                print(element)
                 # get the beam energy for the element
                 energy = beam_energy_along_lattice[self.mapping[base_pv_name].lower()]
 
@@ -133,8 +140,9 @@ class VirtualAccelerator:
                 values[pv_name] = access_cheetah_attribute(
                     element, attribute_name, energy
                 )
-
+                
             else:
                 raise ValueError(f"Invalid PV base name: {base_pv_name}")
 
-        return {name: ele.item() for name,ele in values.items()}
+        return {name: ele.item() if isinstance(ele, torch.Tensor) else ele
+                for name, ele in values.items()}
