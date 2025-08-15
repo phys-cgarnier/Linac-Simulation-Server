@@ -1,7 +1,6 @@
 import pandas as pd
 import torch
 
-
 class FieldAccessor:
     """
     A class to access and set arbitrary attributes of Cheetah elements when logic
@@ -54,12 +53,12 @@ TRANSVERSE_DEFLECTING_CAVITY_MAPPING = {
 }
 
 BPM_MAPPING = {
-    "X": FieldAccessor(lambda e, energy: e.reading[0]),
+    "X": FieldAccessor(lambda e, energy: e.reading[0]), # These are having the same issue as the Screen, something is overwriting it.
     "Y": FieldAccessor(lambda e, energy: e.reading[1]),
 }
 
 SCREEN_MAPPING = {
-    "Image:ArrayData": FieldAccessor(lambda e, energy: (e.reading).cpu().numpy().flatten().tolist()), #ridiculous
+    "Image:ArrayData": FieldAccessor(lambda e, energy: (e.reading).flatten().tolist()), #Needs to be flattened 
     "PNEUMATIC": "is_active",
     "Image:ArraySize0_RBV": FieldAccessor(lambda e, energy: e.resolution[0]),
     "Image:ArraySize1_RBV": FieldAccessor(lambda e, energy: e.resolution[1]),
