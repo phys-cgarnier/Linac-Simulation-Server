@@ -101,6 +101,8 @@ class VirtualAccelerator:
 
 
     def get_pvs(self, pv_names: list):
+        #TODO: By the time this function is called the beam has already overwritten and tracked so there is no beamspot
+        #TODO: if your not convinced plot the image on the init of this class and then plot it here.
         """
         Get the current value of the specified process variable (PV) from the virtual accelerator simulator.
         """
@@ -140,6 +142,7 @@ class VirtualAccelerator:
 
             else:
                 raise ValueError(f"Invalid PV base name: {base_pv_name}")
-
+        #for magnets, tcav, bpms, we get a tensor and its find to turn it into a scalar, images are 2d tensors so they are handled by the
+        #lambda function in pv_mapping
         return {name: ele.item() if isinstance(ele, torch.Tensor) else ele
                 for name, ele in values.items()}
