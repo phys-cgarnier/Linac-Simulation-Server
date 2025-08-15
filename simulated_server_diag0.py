@@ -18,10 +18,7 @@ incoming_beam = ParticleBeam.from_twiss(
     total_charge=torch.tensor(1.0e-9)
 )
 
-#diag0_lattice = Segment.from_lattice_json("lattices/diag0_reconstruction.json")
-#print(diag0_lattice)
 devices = load_relevant_controls('yaml_configs/DIAG0.yaml')
-#TODO: fix some type of bug were defaults are not getting set from passable dictionary.... 
 screen_defaults = {'n_row': 1944, 'n_col': 1472, 'resolution': 23.33 }
 tcav_defaults = {}
 PVDB = create_pvdb(devices, **screen_defaults)
