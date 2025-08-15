@@ -38,6 +38,9 @@ class SimDriver(Driver):
 
     def read(self, reason):
         try:
+            #TODO: If you try and get the beamspot here its as expected but the second you step in .get_pvs the beamspot is gone
+            #TODO: that is a clue as to what is going on.
+            #TODO: can prove this with plotting
             value_dict = self.virtual_accelerator.get_pvs([reason])
             value = value_dict[reason]
             try:
