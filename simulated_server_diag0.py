@@ -42,7 +42,7 @@ driver = SimDriver(
     particle_beam=incoming_beam,
     lattice_file="lattices/new_diag0.json",
     mapping_file=mapping_file,
-    monitor_overview=True,
+    monitor_overview=False,
 )
 
 print("Starting simulated server")

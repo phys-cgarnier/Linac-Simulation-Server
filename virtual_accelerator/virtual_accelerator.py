@@ -61,6 +61,8 @@ class VirtualAccelerator:
 
     def reset(self):
         """ reset the simulation """
+        print("resetting the simulation")
+
         self.lattice = Segment.from_lattice_json(self.lattice_file)
         self.mapping = get_pv_mad_mapping(self.mapping_file)
         self.lattice.track(incoming=self.initial_beam_distribution)
@@ -167,6 +169,10 @@ class VirtualAccelerator:
                 values[pv_name] = torch.all(
                     self.initial_beam_distribution.particle_charges == 0.0
                 )
+                continue
+
+            if pv_name == "VIRT:BEAM:RESET_SIM":
+                values[pv_name] = 0
                 continue
 
             # get the base pv name
