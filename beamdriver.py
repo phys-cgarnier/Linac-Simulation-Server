@@ -11,28 +11,30 @@ from p4p.nt import NTScalar, NTNDArray, NTEnum
 import p4p
 from typing import Dict, Callable, Any
 from virtual_accelerator.virtual_accelerator import VirtualAccelerator
+
+
 class SimServer(SimpleServer):
     """
     Subclass of pcaspy.SimpleServer that also serves PVs via PVA
     """
 
     PV_ASSOC = {
-        'HOPR': 'display.limitHigh',
-        'LOPR': 'display.limitLow',
-        'DRVH': 'control.limitHigh',
-        'DRVL': 'control.limitLow',
-        'DESC': 'display.description',
-        'EGU': 'display.units',
+        "HOPR": "display.limitHigh",
+        "LOPR": "display.limitLow",
+        "DRVH": "control.limitHigh",
+        "DRVL": "control.limitLow",
+        "DESC": "display.description",
+        "EGU": "display.units",
     }
 
     DB_TO_PV = {
-        'unit': 'EGU',
-        'value': 'VAL',
-        'lopr': 'LOPR',
-        'hopr': 'HOPR',
-        'prec': 'PREC',
-        'drvh': 'DRVH',
-        'drvl': 'DRVL'
+        "unit": "EGU",
+        "value": "VAL",
+        "lopr": "LOPR",
+        "hopr": "HOPR",
+        "prec": "PREC",
+        "drvh": "DRVH",
+        "drvl": "DRVL",
     }
 
     class UpdateHandler:
@@ -41,7 +43,10 @@ class SimServer(SimpleServer):
         This also maintains an association between a PV and a subfield in the parent PV. For example,
         if we have a .LOPR pv, that also needs to update the display.limitLow field in the parent.
         """
-        def __init__(self, server, parent: SharedPV|None=None, subfield: str|None=None):
+
+        def __init__(
+            self, server, parent: SharedPV | None = None, subfield: str | None = None
+        ):
             self.server = server
             self._parent = parent
             self._subfield = subfield
@@ -59,7 +64,7 @@ class SimServer(SimpleServer):
             if self.server._callback:
                 self.server._callback(op.name(), op.value())
 
-    def __init__(self, pvdb: dict, prefix: str = ''):
+    def __init__(self, pvdb: dict, prefix: str = ""):
         """
         Parameters
         ----------
@@ -72,16 +77,15 @@ class SimServer(SimpleServer):
         self._callback = None
         self._db = pvdb
 
-        # Create CA PVs 
+        # Create CA PVs
         self.createPV(prefix, pvdb)
 
-     
-        ''
+        ""
         # Create PVA PVs
         for k, v in pvdb.items():
-            if k.rfind('.') != -1:
+            if k.rfind(".") != -1:
                 continue
-            self._pva.update(self._build_pv(f'{prefix}{k}', v))
+            self._pva.update(self._build_pv(f"{prefix}{k}", v))
 
         super().__init__()
 
@@ -126,24 +130,24 @@ class SimServer(SimpleServer):
             Type code for use with NTScalar
         """
         if isinstance(t, int):
-            return 'i'
+            return "i"
         elif isinstance(t, float):
-            return 'd'
+            return "d"
         elif isinstance(t, bool):
-            return '?'
+            return "?"
         elif isinstance(t, str):
-            return 's'
+            return "s"
         else:
-            raise Exception(f'Unsupported type {type(t)}')
+            raise Exception(f"Unsupported type {type(t)}")
 
     def _db_to_pv(self, name: str) -> str:
         """Convert pvdb field name to real EPICS field name"""
         try:
             return self.DB_TO_PV[name]
         except:
-            raise ValueError(f'Unknown field name {name}, please add it to DB_TO_PV!')
+            raise ValueError(f"Unknown field name {name}, please add it to DB_TO_PV!")
 
-    def _pv_assoc(self, field: str) -> str|None:
+    def _pv_assoc(self, field: str) -> str | None:
         """Returns the field association with a NT field in the parent, if any"""
         try:
             return self.PV_ASSOC[field.upper()]
@@ -167,34 +171,34 @@ class SimServer(SimpleServer):
             Dict mapping PV name -> SharedPV instance
         """
         r = {}
-        if not 'type' in desc:
-            desc['type'] = 'float'
+        if not "type" in desc:
+            desc["type"] = "float"
 
         is_image = False
-        match desc['type']:
-            case 'enum':
+        match desc["type"]:
+            case "enum":
                 nt = NTEnum(control=True, display=True, valueAlarm=True)
                 default = {
-                    'index': desc['value'] if 'value' in desc else 0,
-                    'choices': desc['enums']
+                    "index": desc["value"] if "value" in desc else 0,
+                    "choices": desc["enums"],
                 }
-            case 'int':
-                nt = NTScalar('i', control=True, display=True, valueAlarm=True)
-                default = desc['value'] if 'value' in desc else 0
-            case 'float':
+            case "int":
+                nt = NTScalar("i", control=True, display=True, valueAlarm=True)
+                default = desc["value"] if "value" in desc else 0
+            case "float":
                 # If we have count, it's actually an array (image)
-                if 'count' in desc and 'n_col' in desc:
-                    default = np.zeros((desc['n_col'], desc['n_row']), dtype=float)
+                if "count" in desc and "n_col" in desc:
+                    default = np.zeros((desc["n_col"], desc["n_row"]), dtype=float)
                     nt = NTNDArray()
-                    is_image=True
+                    is_image = True
                 else:
-                    nt = NTScalar('d', control=True, display=True, valueAlarm=True)
-                    default = float(desc['value']) if 'value' in desc else 0.0
+                    nt = NTScalar("d", control=True, display=True, valueAlarm=True)
+                    default = float(desc["value"]) if "value" in desc else 0.0
             case _:
                 raise Exception(f'Unhandled type "{desc["type"]}"')
 
         # Special control fields
-        controls = ['enums', 'type', 'value', 'count', 'n_col', 'n_row']
+        controls = ["enums", "type", "value", "count", "n_col", "n_row"]
 
         # Add value field
         val_pv = SharedPV(
@@ -202,11 +206,11 @@ class SimServer(SimpleServer):
             initial=default,
             handler=SimServer.UpdateHandler(self),
         )
-        r[f'{name}.VAL'] = val_pv
-        r[f'{name}'] = val_pv
+        r[f"{name}.VAL"] = val_pv
+        r[f"{name}"] = val_pv
 
         # Get a Value out of SharedPV
-        if desc['type'] != 'enum' and not is_image:
+        if desc["type"] != "enum" and not is_image:
             cur = nt.wrap(val_pv.current())
         else:
             cur = None
@@ -214,7 +218,7 @@ class SimServer(SimpleServer):
         # Build generic fields
         for k, v in desc.items():
             if k in controls:
-                continue # Skip special values
+                continue  # Skip special values
 
             field = self._db_to_pv(k.lower())
 
@@ -223,10 +227,10 @@ class SimServer(SimpleServer):
             par_pv = val_pv if sub else None
 
             # Build a PV for each field
-            r[f'{name}.{k.upper()}'] = SharedPV(
+            r[f"{name}.{k.upper()}"] = SharedPV(
                 nt=NTScalar(self._type_desc(v)),
                 initial=v,
-                handler=SimServer.UpdateHandler(self, parent=par_pv, subfield=sub)
+                handler=SimServer.UpdateHandler(self, parent=par_pv, subfield=sub),
             )
 
             if sub and cur:
@@ -241,7 +245,7 @@ class SimServer(SimpleServer):
     def set_pv(self, name: str, value):
         """
         Update a PVA PV with a new value
-        
+
         Parameters
         ----------
         name : str
@@ -251,70 +255,28 @@ class SimServer(SimpleServer):
         """
         self._pva[name].post(value)
 
+
 # TODO: set defaults for all tcav enum pvs
-#  
+#
 class SimDriver(Driver):
-    def __init__(self,
-                 server: SimServer,
-                 screen: str,
-                 devices: dict,
-                 mapping_file: str,
-                 design_incoming_beam:dict = None,
-                 particle_beam: ParticleBeam = None,
-                 lattice_file: str = None,
-                 beamline: Segment = None,
-                 enum_init_values: dict = None
-                  
-                 ):
+    def __init__(
+        self,
+        server: SimServer,
+        devices: dict,
+        mapping_file: str,
+        particle_beam: ParticleBeam = None,
+        lattice_file: str = None,
+    ):
         super().__init__()
-        self.virtual_accelerator = VirtualAccelerator(lattice_file=lattice_file,initial_beam_distribution=particle_beam,mapping_file=mapping_file)
+        self.virtual_accelerator = VirtualAccelerator(
+            lattice_file=lattice_file,
+            initial_beam_distribution=particle_beam,
+            mapping_file=mapping_file,
+        )
         self.server = server
         self.devices = devices
-        #pprint.pprint(devices)
-        '''
-            'OTRS:DIAG0:525': {'madname': 'otrdg04',
-                    'metadata': {'area': 'DIAG0',
-                                 'beam_path': ['SC_DIAG0'],
-                                 'sum_l_meters': 61.871,
-                                 'type': 'PROF'},
-                    'pvs': {'image': 'OTRS:DIAG0:525:Image:ArrayData',
-                            'n_bits': 'OTRS:DIAG0:525:N_OF_BITS',
-                            'n_col': 'OTRS:DIAG0:525:Image:ArraySize1_RBV',
-                            'n_row': 'OTRS:DIAG0:525:Image:ArraySize0_RBV',
-                            'pneumatic': 'OTRS:DIAG0:525:PNEUMATIC',
-                            'ref_rate': 'OTRS:DIAG0:525:ArrayRate_RBV',
-                            'ref_rate_vme': 'OTRS:DIAG0:525:FRAME_RATE',
-                            'resolution': 'OTRS:DIAG0:525:RESOLUTION',
-                            'sys_type': 'OTRS:DIAG0:525:SYS_TYPE'}},
-            'QUAD:DIAG0:190': {'madname': 'qdg001',
-                    'metadata': {'area': 'DIAG0',
-                                 'beam_path': ['SC_DIAG0'],
-                                 'l_eff': 0.197,
-                                 'sum_l_meters': 46.232,
-                                 'type': 'QUAD'},
-                    'pvs': {'bact': 'QUAD:DIAG0:190:BACT',
-                            'bcon': 'QUAD:DIAG0:190:BCON',
-                            'bctrl': 'QUAD:DIAG0:190:BCTRL',
-                            'bdes': 'QUAD:DIAG0:190:BDES',
-                            'bmax': 'QUAD:DIAG0:190:BMAX',
-                            'bmin': 'QUAD:DIAG0:190:BMIN',
-                            'ctrl': 'QUAD:DIAG0:190:CTRL'}},
-            'TCAV:DIAG0:11': {'madname': 'tcxdg0',
-                   'metadata': {'area': 'DIAG0',
-                                'beam_path': ['SC_DIAG0'],
-                                'l_eff': 0.8,
-                                'rf_freq': 2856,
-                                'sum_l_meters': 53.313,
-                                'type': 'LCAV'},
-                   'pvs': {'amp_fbenb': 'TCAV:DIAG0:11:AFBENB',
-                           'amp_fbst': 'TCAV:DIAG0:11:AFBST',
-                           'amp_set': 'TCAV:DIAG0:11:AREQ',
-                           'mode_config': 'TCAV:DIAG0:11:MODECFG',
-                           'phase_fbenb': 'TCAV:DIAG0:11:PFBENB',
-                           'phase_fbst': 'TCAV:DIAG0:11:PFBST',
-                           'phase_set': 'TCAV:DIAG0:11:PREQ',
-                           'rf_enable': 'TCAV:DIAG0:11:RF_ENABLE'}}}
-        '''
+        # pprint.pprint(devices)
+
     def read(self, reason):
         try:
             value_dict = self.virtual_accelerator.get_pvs([reason])
@@ -324,14 +286,11 @@ class SimDriver(Driver):
             print(e)
             return None
 
-
     def write(self, reason, value):
         try:
-            self.virtual_accelerator.set_pvs({reason:value})
+            self.virtual_accelerator.set_pvs({reason: value})
         except ValueError as e:
-           print(e)
+            print(e)
 
 
-
-
-#TODO: add functionality to pop screens in and out
+# TODO: add functionality to pop screens in and out

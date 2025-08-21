@@ -34,8 +34,13 @@ def get_magnetic_rigidity(energy):
 
 # -- include conversions for cheetah attributes to SLAC EPICS attributes
 QUADRUPOLE_MAPPING = {
-    "BCTRL": FieldAccessor(lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy), lambda e, energy, k1: setattr(e, "k1", k1 / get_magnetic_rigidity(energy) / e.length)),
-    "BACT": FieldAccessor(lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy))
+    "BCTRL": FieldAccessor(
+        lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy), 
+        lambda e, energy, k1: setattr(e, "k1", k1 / get_magnetic_rigidity(energy) / e.length)
+    ),
+    "BACT": FieldAccessor(
+        lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy)
+    )
 }
 
 SOLENOID_MAPPING = {
@@ -56,14 +61,16 @@ TRANSVERSE_DEFLECTING_CAVITY_MAPPING = {
 BPM_MAPPING = {
     "X": FieldAccessor(lambda e, energy: e.reading[0]),
     "Y": FieldAccessor(lambda e, energy: e.reading[1]),
+    "XSCDT1H": FieldAccessor(lambda e, energy: e.reading[0]),
+    "YSCDT1H": FieldAccessor(lambda e, energy: e.reading[1]),
 }
 
 SCREEN_MAPPING = {
-    "Image:ArrayData": FieldAccessor(lambda e: e.reading),
+    "Image:ArrayData": FieldAccessor(lambda e, energy: e.reading),
     "PNEUMATIC": "is_active",
-    "Image:ArraySize1_RBV": FieldAccessor(lambda e: e.resolution[0]),
-    "Image:ArraySize2_RBV": FieldAccessor(lambda e: e.resolution[1]),
-    "RESOLUTION": FieldAccessor(lambda e: e.pixel_size[0]),
+    "Image:ArraySize1_RBV": FieldAccessor(lambda e, energy: e.resolution[0]),
+    "Image:ArraySize0_RBV": FieldAccessor(lambda e, energy: e.resolution[1]),
+    "RESOLUTION": FieldAccessor(lambda e, energy: e.pixel_size[0]),
 }
 
 MAPPINGS = {

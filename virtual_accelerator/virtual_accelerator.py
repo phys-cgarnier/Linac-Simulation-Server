@@ -107,8 +107,8 @@ class VirtualAccelerator:
         for pv_name in pv_names:
             # handle the beam shutter separately
             if pv_name == self.beam_shutter_pv:
-                values[pv_name] = (
-                    self.initial_beam_distribution.particle_charges.item() == 0.0
+                values[pv_name] = torch.all(
+                    self.initial_beam_distribution.particle_charges == 0.0
                 )
                 continue
 
@@ -130,6 +130,7 @@ class VirtualAccelerator:
                 if isinstance(element, list):
                     element = element[0]
 
+                print("accessing element " + element.name + " for PV " + pv_name)
                 values[pv_name] = access_cheetah_attribute(
                     element, attribute_name, energy
                 )
@@ -137,4 +138,13 @@ class VirtualAccelerator:
             else:
                 raise ValueError(f"Invalid PV base name: {base_pv_name}")
 
-        return {name: ele.item() for name,ele in values.items()}
+
+        # sanitize outputs
+        for name, ele in values.items():
+            if isinstance(ele, torch.Tensor):
+                if ele.shape == torch.Size([]):
+                    values[name] = ele.item()
+                elif len(ele.shape) > 0:
+                    values[name] = ele.flatten().tolist()
+
+        return values
