@@ -266,12 +266,14 @@ class SimDriver(Driver):
         mapping_file: str,
         particle_beam: ParticleBeam = None,
         lattice_file: str = None,
+        monitor_overview: bool = False
     ):
         super().__init__()
         self.virtual_accelerator = VirtualAccelerator(
             lattice_file=lattice_file,
             initial_beam_distribution=particle_beam,
             mapping_file=mapping_file,
+            monitor_overview=monitor_overview,
         )
         self.server = server
         self.devices = devices

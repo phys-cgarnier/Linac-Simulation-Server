@@ -1,5 +1,7 @@
+from copy import deepcopy
 from cheetah.accelerator import Segment
 from cheetah.particles import ParticleBeam
+from matplotlib import pyplot as plt
 import torch
 from virtual_accelerator.pv_mapping import access_cheetah_attribute, get_pv_mad_mapping
 
@@ -11,13 +13,35 @@ class VirtualAccelerator:
         mapping_file,
         initial_beam_distribution,
         beam_shutter_pv=None,
+        monitor_overview=False,
     ):
+        """
+        Virtual accelerator class based on cheetah beam dynamics simulations. 
+        Runs a new cheetah tracking simulation any time a process variable (PV) is updated.
+
+        Parameters
+        ----------
+        lattice_file : str
+            Path to the cheetah lattice JSON file.
+        mapping_file : str
+            Path to the mapping CSV file that maps PV base names 
+            to corresponding MAD names used in cheetah.
+        initial_beam_distribution : ParticleBeam
+            Initial beam distribution to be used in the simulation.
+        beam_shutter_pv : str, optional
+            Process variable (PV) name for the beam shutter.
+        monitor_overview : bool, optional
+            Whether to monitor the overview of the simulation. If True, the overview 
+            plot from cheetah will be generated and saved every time a new simulation is run.
+
+        """
         self.lattice = Segment.from_lattice_json(lattice_file)
         self.mapping = get_pv_mad_mapping(mapping_file)
         self.initial_beam_distribution = initial_beam_distribution
         self.initial_beam_distribution_charge = (
             initial_beam_distribution.particle_charges
         )
+        self.monitor_overview = monitor_overview
 
         # store the beam shutter PV name
         self.beam_shutter_pv = beam_shutter_pv
@@ -25,19 +49,28 @@ class VirtualAccelerator:
         # do a first run to populate readings
         self.lattice.track(incoming=self.initial_beam_distribution)
 
+        if self.monitor_overview:
+            self._monitor_index = 0
+            fig = plt.figure()
+            self.lattice.plot_overview(incoming=self.initial_beam_distribution, fig=fig)
+            fig.savefig(f"simulation_overview_{self._monitor_index:04d}.png")
+
     def get_energy(self):
         """
         Get the energy of the beam in the virtual accelerator simulator at
         every element for use in calculating the magnetic rigidity.
+        
+        Note: need to track on a copy of the lattice to not influence readings!
         """
         test_beam = ParticleBeam(
             torch.zeros(1, 7), energy=self.initial_beam_distribution.energy
         )
-        element_names = [e.name for e in self.lattice.elements]
+        test_lattice = deepcopy(self.lattice)
+        element_names = [e.name for e in test_lattice.elements]
         return dict(
             zip(
                 element_names,
-                self.lattice.get_beam_attrs_along_segment(("energy",), test_beam)[0],
+                test_lattice.get_beam_attrs_along_segment(("energy",), test_beam)[0],
             )
         )
 
@@ -97,6 +130,12 @@ class VirtualAccelerator:
         # at the end of setting all PVs, run the simulation with the initial beam distribution
         # this will update all readings (screens, BPMs, etc.) in the lattice
         self.lattice.track(incoming=self.initial_beam_distribution)
+
+        if self.monitor_overview:
+            self._monitor_index += 1
+            fig = plt.figure()
+            self.lattice.plot_overview(incoming=self.initial_beam_distribution, fig=fig)
+            fig.savefig(f"simulation_overview_{self._monitor_index:04d}.png")
 
     def get_pvs(self, pv_names: list):
         """
