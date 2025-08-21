@@ -40,7 +40,12 @@ QUADRUPOLE_MAPPING = {
     ),
     "BACT": FieldAccessor(
         lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy)
-    )
+    ),
+    "BMAX": FieldAccessor(lambda e, energy: 20.0),
+    "BMIN": FieldAccessor(lambda e, energy: -20.0),
+    "CTRL": FieldAccessor(lambda e, energy: "Ready"),
+    "BCON": FieldAccessor(lambda e, energy: 1.0),
+    "BDES": FieldAccessor(lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy)),
 }
 
 SOLENOID_MAPPING = {
