@@ -35,8 +35,12 @@ class VirtualAccelerator:
             plot from cheetah will be generated and saved every time a new simulation is run.
 
         """
+        self.lattice_file = lattice_file
+        self.mapping_file = mapping_file
+
         self.lattice = Segment.from_lattice_json(lattice_file)
         self.mapping = get_pv_mad_mapping(mapping_file)
+
         self.initial_beam_distribution = initial_beam_distribution
         self.initial_beam_distribution_charge = (
             initial_beam_distribution.particle_charges
@@ -47,6 +51,18 @@ class VirtualAccelerator:
         self.beam_shutter_pv = beam_shutter_pv
 
         # do a first run to populate readings
+        self.lattice.track(incoming=self.initial_beam_distribution)
+
+        if self.monitor_overview:
+            self._monitor_index = 0
+            fig = plt.figure()
+            self.lattice.plot_overview(incoming=self.initial_beam_distribution, fig=fig)
+            fig.savefig(f"simulation_overview_{self._monitor_index:04d}.png")
+
+    def reset(self):
+        """ reset the simulation """
+        self.lattice = Segment.from_lattice_json(self.lattice_file)
+        self.mapping = get_pv_mad_mapping(self.mapping_file)
         self.lattice.track(incoming=self.initial_beam_distribution)
 
         if self.monitor_overview:
@@ -93,11 +109,14 @@ class VirtualAccelerator:
         """
         Set the corresponding process variable (PV) to the given value on the virtual accelerator simulator.
         """
-
         for pv_name, value in values.items():
             # handle the beam shutter separately
             if pv_name == self.beam_shutter_pv:
                 self.set_shutter(value)
+                continue
+
+            if pv_name == "VIRT:BEAM:RESET_SIM":
+                self.reset()
                 continue
 
             # get the base pv name
@@ -141,7 +160,6 @@ class VirtualAccelerator:
         """
         Get the current value of the specified process variable (PV) from the virtual accelerator simulator.
         """
-
         values = {}
         for pv_name in pv_names:
             # handle the beam shutter separately
@@ -176,7 +194,6 @@ class VirtualAccelerator:
 
             else:
                 raise ValueError(f"Invalid PV base name: {base_pv_name}")
-
 
         # sanitize outputs
         for name, ele in values.items():
