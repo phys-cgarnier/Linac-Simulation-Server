@@ -326,6 +326,7 @@ class SimDriver(Driver):
     def write(self, reason, value):
         try:
             self.virtual_accelerator.set_pvs({reason: value})
+            self.server.set_pv(reason, value)
             self.update_pvs(self.measurement_pvs)
 
         except ValueError as e:
