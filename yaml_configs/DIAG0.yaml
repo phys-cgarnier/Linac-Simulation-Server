@@ -1,7 +1,10 @@
 bpms:
-  BPMDG000?:
+  BPMDG000:
     controls_information:
-      PVs: {}
+      PVs:
+        tmit: BPMS:DIAG0:136:TMIT
+        x: BPMS:DIAG0:136:X
+        y: BPMS:DIAG0:136:Y
       control_name: BPMS:DIAG0:136
     metadata:
       area: DIAG0
@@ -128,7 +131,10 @@ bpms:
       type: BPM
   BPMDG0RF:
     controls_information:
-      PVs: {}
+      PVs:
+        tmit: BPMS:DIAG0:330:TMIT
+        x: BPMS:DIAG0:330:X
+        y: BPMS:DIAG0:330:Y
       control_name: BPMS:DIAG0:330
     metadata:
       area: DIAG0

@@ -96,7 +96,7 @@ class TestPVMapping:
             "hcor1:BACT": 0.0,
             "vcor1:BACT": 0.0,
             "screen1:RESOLUTION": 0.1,
-            "screen1:Image:ArraySize2_RBV": 10,
+            "screen1:Image:ArraySize1_RBV": 10,
             "tcav1:AREQ": 0.0,
             "tcav1:PREQ": 45.0,
         }

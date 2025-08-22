@@ -27,15 +27,16 @@ screen_defaults = {"n_row": 1944, "n_col": 1472, "resolution": 23.33}
 tcav_defaults = {}
 PVDB = create_pvdb(devices, **screen_defaults)
 custom_pvs = {
-    "VIRT:BEAM:EMITTANCES": {"type": "float", "count": 2},
-    "VIRT:BEAM:MU:XY": {"type": "float", "count": 2},
-    "VIRT:BEAM:SIGMA:XY": {"type": "float", "count": 2},
+#    "VIRT:BEAM:EMITTANCES": {"type": "float", "count": 2},
+#    "VIRT:BEAM:MU:XY": {"type": "float", "count": 2},
+#    "VIRT:BEAM:SIGMA:XY": {"type": "float", "count": 2},
     "VIRT:BEAM:RESET_SIM": {"value": 0},
 }
 PVDB.update(custom_pvs)
-pprint.pprint(PVDB)
+#pprint.pprint(PVDB.keys())
 mapping_file = "virtual_accelerator/tests/resources/lcls_elements.csv"
 server = SimServer(PVDB)
+
 driver = SimDriver(
     server=server,
     devices=devices,

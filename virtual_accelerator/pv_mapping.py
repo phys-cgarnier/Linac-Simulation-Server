@@ -50,17 +50,35 @@ QUADRUPOLE_MAPPING = {
 
 SOLENOID_MAPPING = {
     "BCTRL": FieldAccessor(lambda e, energy: e.k * get_magnetic_rigidity(energy), lambda e, energy, k: setattr(e, "k", k / (2*get_magnetic_rigidity(energy)))),
-    "BACT": FieldAccessor(lambda e, energy: e.k * get_magnetic_rigidity(energy))
+    "BACT": FieldAccessor(lambda e, energy: e.k * get_magnetic_rigidity(energy)),
+    "BMAX": FieldAccessor(lambda e, energy: 20.0),
+    "BMIN": FieldAccessor(lambda e, energy: -20.0),
+    "CTRL": FieldAccessor(lambda e, energy: "Ready"),
+    "BCON": FieldAccessor(lambda e, energy: 1.0),
+    "BDES": FieldAccessor(lambda e, energy: e.k * get_magnetic_rigidity(energy)),
 }
 
 CORRECTOR_MAPPING = {
     "BCTRL": FieldAccessor(lambda e, energy: e.angle * get_magnetic_rigidity(energy), lambda e, energy, a: setattr(e, "angle", a / get_magnetic_rigidity(energy))),
-    "BACT": FieldAccessor(lambda e, energy: e.angle * get_magnetic_rigidity(energy))
+    "BACT": FieldAccessor(lambda e, energy: e.angle * get_magnetic_rigidity(energy)),
+    "BMAX": FieldAccessor(lambda e, energy: 20.0),
+    "BMIN": FieldAccessor(lambda e, energy: -20.0),
+    "CTRL": FieldAccessor(lambda e, energy: "Ready"),
+    "BCON": FieldAccessor(lambda e, energy: 1.0),
+    "BDES": FieldAccessor(lambda e, energy: e.angle * get_magnetic_rigidity(energy)),
 }
 
 TRANSVERSE_DEFLECTING_CAVITY_MAPPING = {
     "AREQ": "voltage",
     "PREQ": "phase",
+    "AFBENB": FieldAccessor(lambda e, energy: 0.0),
+    "AFBST": FieldAccessor(lambda e, energy: 0.0),
+    "AMPL_W0CH0": FieldAccessor(lambda e, energy: 0.0),
+    "MODECFG": FieldAccessor(lambda e, energy: 0.0),
+    "PACT_AVGNT": FieldAccessor(lambda e, energy: 0.0),
+    "PFBENB": FieldAccessor(lambda e, energy: 0.0),
+    "PFBST": FieldAccessor(lambda e, energy: 0.0),
+    "RF_ENABLE": FieldAccessor(lambda e, energy: 1.0)
 }
 
 BPM_MAPPING = {
@@ -68,6 +86,7 @@ BPM_MAPPING = {
     "Y": FieldAccessor(lambda e, energy: e.reading[1]),
     "XSCDT1H": FieldAccessor(lambda e, energy: e.reading[0]),
     "YSCDT1H": FieldAccessor(lambda e, energy: e.reading[1]),
+    "TMIT": FieldAccessor(lambda e, energy: 1.0),
 }
 
 SCREEN_MAPPING = {

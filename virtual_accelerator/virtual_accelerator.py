@@ -1,5 +1,6 @@
+import time
 from copy import deepcopy
-from cheetah.accelerator import Segment
+from cheetah.accelerator import Segment, Screen
 from cheetah.particles import ParticleBeam
 from matplotlib import pyplot as plt
 import torch
@@ -38,7 +39,15 @@ class VirtualAccelerator:
         self.lattice_file = lattice_file
         self.mapping_file = mapping_file
 
-        self.lattice = Segment.from_lattice_json(lattice_file)
+        lattice = Segment.from_lattice_json(lattice_file)
+
+        #change screen reading method to histogram
+        for ele in lattice.elements:
+            if isinstance(ele, Screen):
+                ele.method = "histogram"
+
+        self.lattice = lattice
+
         self.mapping = get_pv_mad_mapping(mapping_file)
 
         self.initial_beam_distribution = initial_beam_distribution
@@ -52,6 +61,9 @@ class VirtualAccelerator:
 
         # do a first run to populate readings
         self.lattice.track(incoming=self.initial_beam_distribution)
+
+        # compute the energy
+        self.beam_energy_along_lattice = self.get_energy()
 
         if self.monitor_overview:
             self._monitor_index = 0
@@ -126,7 +138,7 @@ class VirtualAccelerator:
             attribute_name = ":".join(pv_name.split(":")[3:])
 
             # get the beam energy along the lattice -- returns a dict of element names to energies
-            beam_energy_along_lattice = self.get_energy()
+            beam_energy_along_lattice = self.beam_energy_along_lattice
 
             # check if the pv_name is a control variable
             if base_pv_name in self.mapping:
@@ -141,6 +153,7 @@ class VirtualAccelerator:
                     element = element[0]
 
                 try:
+                    print("accessing element " + element.name + " to set PV " + pv_name + " to " + str(value))
                     access_cheetah_attribute(element, attribute_name, energy, value)
                 except ValueError as e:
                     raise ValueError(f"Failed to set PV {pv_name}: {str(e)}") from e
@@ -162,6 +175,7 @@ class VirtualAccelerator:
         """
         Get the current value of the specified process variable (PV) from the virtual accelerator simulator.
         """
+
         values = {}
         for pv_name in pv_names:
             # handle the beam shutter separately
@@ -177,11 +191,10 @@ class VirtualAccelerator:
 
             # get the base pv name
             base_pv_name = ":".join(pv_name.split(":")[:3])
-            print(base_pv_name)
             attribute_name = ":".join(pv_name.split(":")[3:])
 
             # get the beam energy along the lattice
-            beam_energy_along_lattice = self.get_energy()
+            beam_energy_along_lattice = self.beam_energy_along_lattice
 
             # check if the pv_name is a control variable
             if base_pv_name in self.mapping:
@@ -193,7 +206,7 @@ class VirtualAccelerator:
                 if isinstance(element, list):
                     element = element[0]
 
-                print("accessing element " + element.name + " for PV " + pv_name)
+                print("accessing element " + element.name + " to get PV " + pv_name)
                 values[pv_name] = access_cheetah_attribute(
                     element, attribute_name, energy
                 )

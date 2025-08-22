@@ -55,6 +55,10 @@ class TestVirtualAccelerator:
                 0
             ].length
         )
+
+        # Verify the BACT is updated to match the BCTRL value
+        assert self.va.get_pvs(["QUAD:DIAG0:190:BACT"])["QUAD:DIAG0:190:BACT"] == values["QUAD:DIAG0:190:BCTRL"]
+
         assert (
             getattr(self.va.lattice, self.va.mapping["XCOR:DIAG0:178"].lower()).angle
             == torch.tensor(0.1) / 2.0

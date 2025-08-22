@@ -279,10 +279,37 @@ class SimDriver(Driver):
         self.devices = devices
         # pprint.pprint(devices)
 
+        # get list of pvs that should be updated every time we write to a PV
+        self.measurement_pvs = self.get_measurement_pvs()
+
+    def get_measurement_pvs(self):
+        # Get a list of PVs that should be updated every time we write to a PV
+        key_list = list(self.server.pva_pvs.keys())
+
+        # filter out keys with attributes
+        key_list = [k for k in key_list if not "." in k]
+
+        # filter out keys that will not be updated
+        ignore_flags = [
+            "BMAX", "BMIN", "CTRL", "BDES", "BCON", "ArraySize0_RBV", "ArraySize1_RBV",
+            "RESOLUTION", "ENB", "BST", "MODE", "ENABLE", "REQ"
+        ]
+        key_list = [k for k in key_list if not any(flag in k for flag in ignore_flags)]
+
+        return key_list
+
+    def update_pvs(self):
+        # read all the pvs
+        values = self.virtual_accelerator.get_pvs(self.measurement_pvs)
+        for name,val in values.items():
+            # Post PVA changes
+            self.server.set_pv(name, val)   
+
     def read(self, reason):
         try:
             value_dict = self.virtual_accelerator.get_pvs([reason])
             value = value_dict[reason]
+
             return value
         except ValueError as e:
             print(e)
@@ -291,6 +318,9 @@ class SimDriver(Driver):
     def write(self, reason, value):
         try:
             self.virtual_accelerator.set_pvs({reason: value})
+            self.update_pvs()
+            self.server.set_pv(reason, value)
+
         except ValueError as e:
             print(e)
 
