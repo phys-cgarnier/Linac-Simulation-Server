@@ -1,12 +1,7 @@
 import time
 from pcaspy import Driver, SimpleServer
 from cheetah.particles import ParticleBeam
-from cheetah.accelerator import Segment, Screen
 import numpy as np
-import torch
-from scipy.stats import cauchy
-import pprint
-import math
 from p4p.server.thread import SharedPV
 from p4p.nt import NTScalar, NTNDArray, NTEnum
 import p4p
@@ -257,8 +252,6 @@ class SimServer(SimpleServer):
         self._pva[name].post(value)
 
 
-# TODO: set defaults for all tcav enum pvs
-#
 class SimDriver(Driver):
     def __init__(
         self,
@@ -305,20 +298,12 @@ class SimDriver(Driver):
         return key_list
 
     def update_pvs(self, pv_list):
-        # NOTE: Slowing down this function will cause timeout issues when accessing PV values
         print("Updating PVs...")
-        # print("Measurement PVs: ", self.measurement_pvs)
-        # read all the pvs
-        #values = self.virtual_accelerator.get_pvs(pv_list)
         for name in pv_list:
-            # Post PVA changes
-            #if not "Array" in name:
-            #    print(f"Setting {name} to {val}")
             self.read(name)
         print("PVs updated.")   
 
     def read(self, reason):
-        print("reading " + reason)
         value =  self.virtual_accelerator.get_pvs([reason])[reason]
         self.server.set_pv(reason, value)
         try:
@@ -346,7 +331,3 @@ class SimDriver(Driver):
         self.update_pvs(self.measurement_pvs)
 
         print(f"Write took {time.time() - start:.3f} seconds")
-
-
-
-# TODO: add functionality to pop screens in and out
