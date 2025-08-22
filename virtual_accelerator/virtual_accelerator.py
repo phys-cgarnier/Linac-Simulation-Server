@@ -1,4 +1,3 @@
-import time
 from copy import deepcopy
 from cheetah.accelerator import Segment, Screen
 from cheetah.particles import ParticleBeam
@@ -206,7 +205,7 @@ class VirtualAccelerator:
                 if isinstance(element, list):
                     element = element[0]
 
-                print("accessing element " + element.name + " to get PV " + pv_name)
+                # print("accessing element " + element.name + " to get PV " + pv_name)
                 values[pv_name] = access_cheetah_attribute(
                     element, attribute_name, energy
                 )

@@ -115,6 +115,9 @@ class TestVirtualAccelerator:
         for name, value in values.items():
             assert torch.all(~torch.isnan(torch.tensor(value)))
 
+        values = self.va.get_pvs(["QUAD:DIAG0:190:CTRL"])
+        assert values["QUAD:DIAG0:190:CTRL"] == "Ready"
+
     def test_set_shutter(self):
         # Set the beam shutter to open
         self.va.set_shutter(True)

@@ -282,8 +282,13 @@ class SimDriver(Driver):
         # get list of pvs that should be updated every time we write to a PV
         self.measurement_pvs = self.get_measurement_pvs()
 
+        # initialize ALL pvs with values
+        key_list = list(self.server.pva_pvs.keys())
+        key_list = [k for k in key_list if not "." in k]  # filter out keys with attributes
+        self.update_pvs(key_list)
+
     def get_measurement_pvs(self):
-        # Get a list of PVs that should be updated every time we write to a PV
+        """ Get a list of PVs that should be updated every time we write to a PV """
         key_list = list(self.server.pva_pvs.keys())
 
         # filter out keys with attributes
@@ -291,35 +296,37 @@ class SimDriver(Driver):
 
         # filter out keys that will not be updated
         ignore_flags = [
-            "BMAX", "BMIN", "CTRL", "BDES", "BCON", "ArraySize0_RBV", "ArraySize1_RBV",
-            "RESOLUTION", "ENB", "BST", "MODE", "ENABLE", "REQ"
+            "BMAX", "BMIN", "BDES", "BCON", "ArraySize0_RBV", "ArraySize1_RBV",
+            "RESOLUTION", "ENB", "BST", "MODE", "ENABLE", "REQ", "CTRL", "TMIT"
         ]
         key_list = [k for k in key_list if not any(flag in k for flag in ignore_flags)]
 
         return key_list
 
-    def update_pvs(self):
+    def update_pvs(self, pv_list):
+        # NOTE: Slowing down this function will cause timeout issues when accessing PV values
+        print("Updating PVs...")
+        # print("Measurement PVs: ", self.measurement_pvs)
         # read all the pvs
-        values = self.virtual_accelerator.get_pvs(self.measurement_pvs)
+        values = self.virtual_accelerator.get_pvs(pv_list)
         for name,val in values.items():
             # Post PVA changes
+            if not "Array" in name:
+                print(f"Setting {name} to {val}")
             self.server.set_pv(name, val)   
 
     def read(self, reason):
         try:
-            value_dict = self.virtual_accelerator.get_pvs([reason])
-            value = value_dict[reason]
-
-            return value
+            print("reading " + reason)
+            value =  self.virtual_accelerator.get_pvs([reason])[reason]
+            self.server.set_pv(reason, value)
         except ValueError as e:
             print(e)
-            return None
 
     def write(self, reason, value):
         try:
             self.virtual_accelerator.set_pvs({reason: value})
-            self.update_pvs()
-            self.server.set_pv(reason, value)
+            self.update_pvs(self.measurement_pvs)
 
         except ValueError as e:
             print(e)
