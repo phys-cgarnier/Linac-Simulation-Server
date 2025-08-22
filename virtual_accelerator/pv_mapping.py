@@ -89,8 +89,9 @@ BPM_MAPPING = {
     "TMIT": FieldAccessor(lambda e, energy: 1.0),
 }
 
+# multiply image intensity by 16 bit number range (is similar to real machine?)
 SCREEN_MAPPING = {
-    "Image:ArrayData": FieldAccessor(lambda e, energy: e.reading),
+    "Image:ArrayData": FieldAccessor(lambda e, energy: e.reading.T * 65535),
     "PNEUMATIC": "is_active",
     "Image:ArraySize1_RBV": FieldAccessor(lambda e, energy: e.resolution[0]),
     "Image:ArraySize0_RBV": FieldAccessor(lambda e, energy: e.resolution[1]),

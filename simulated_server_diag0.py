@@ -36,7 +36,6 @@ PVDB.update(custom_pvs)
 #pprint.pprint(PVDB.keys())
 mapping_file = "virtual_accelerator/tests/resources/lcls_elements.csv"
 server = SimServer(PVDB)
-
 driver = SimDriver(
     server=server,
     devices=devices,

@@ -1,3 +1,4 @@
+import time
 from pcaspy import Driver, SimpleServer
 from cheetah.particles import ParticleBeam
 from cheetah.accelerator import Segment, Screen
@@ -103,7 +104,7 @@ class SimServer(SimpleServer):
     def run(self):
         self._server = p4p.server.Server(providers=[self._pva])
         while True:
-            self.process(0.1)
+            self.process(0.001)
 
     @property
     def pva_pvs(self) -> Dict[str, SharedPV]:
@@ -308,29 +309,44 @@ class SimDriver(Driver):
         print("Updating PVs...")
         # print("Measurement PVs: ", self.measurement_pvs)
         # read all the pvs
-        values = self.virtual_accelerator.get_pvs(pv_list)
-        for name,val in values.items():
+        #values = self.virtual_accelerator.get_pvs(pv_list)
+        for name in pv_list:
             # Post PVA changes
-            if not "Array" in name:
-                print(f"Setting {name} to {val}")
-            self.server.set_pv(name, val)   
+            #if not "Array" in name:
+            #    print(f"Setting {name} to {val}")
+            self.read(name)
+        print("PVs updated.")   
 
     def read(self, reason):
+        print("reading " + reason)
+        value =  self.virtual_accelerator.get_pvs([reason])[reason]
+        self.server.set_pv(reason, value)
         try:
-            print("reading " + reason)
-            value =  self.virtual_accelerator.get_pvs([reason])[reason]
-            self.server.set_pv(reason, value)
-        except ValueError as e:
-            print(e)
+            self.setParam(reason, value)
+        except Exception as e:
+            print(f"Error setting param for {reason}: {e}")
+
+        self.updatePVs()
+        return value
 
     def write(self, reason, value):
-        try:
-            self.virtual_accelerator.set_pvs({reason: value})
-            self.server.set_pv(reason, value)
-            self.update_pvs(self.measurement_pvs)
+        """write to a PV, run the simulation, and then update all other PVs"""
+        print(f"Writing {value} to {reason}")
+        start = time.time()
 
-        except ValueError as e:
-            print(e)
+        # update the control PV fast
+        self.server.set_pv(reason, value)
+        self.setParam(reason, value)
+        self.updatePV(reason)
+
+        # run simulation
+        self.virtual_accelerator.set_pvs({reason: value})
+
+        # update pvs
+        self.update_pvs(self.measurement_pvs)
+
+        print(f"Write took {time.time() - start:.3f} seconds")
+
 
 
 # TODO: add functionality to pop screens in and out
