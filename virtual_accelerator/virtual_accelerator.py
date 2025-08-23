@@ -206,9 +206,12 @@ class VirtualAccelerator:
                     element = element[0]
 
                 # print("accessing element " + element.name + " to get PV " + pv_name)
-                values[pv_name] = access_cheetah_attribute(
-                    element, attribute_name, energy
-                )
+                try:
+                    values[pv_name] = access_cheetah_attribute(
+                        element, attribute_name, energy
+                    )
+                except ValueError as e:
+                    raise ValueError(f"Failed to get PV {pv_name}: {str(e)}") from e
 
             else:
                 raise ValueError(f"Invalid PV base name: {base_pv_name}")

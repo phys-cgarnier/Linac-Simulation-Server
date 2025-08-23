@@ -95,7 +95,7 @@ SCREEN_MAPPING = {
     "PNEUMATIC": "is_active",
     "Image:ArraySize1_RBV": FieldAccessor(lambda e, energy: e.resolution[0]),
     "Image:ArraySize0_RBV": FieldAccessor(lambda e, energy: e.resolution[1]),
-    "RESOLUTION": FieldAccessor(lambda e, energy: e.pixel_size[0]),
+    "RESOLUTION": FieldAccessor(lambda e, energy: e.pixel_size[0]*1e6),
 }
 
 MAPPINGS = {

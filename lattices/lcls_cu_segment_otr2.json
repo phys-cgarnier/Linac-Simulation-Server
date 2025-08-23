@@ -446,8 +446,14 @@
         "otr2": [
             "Screen",
             {
-                "resolution": [1392, 1040],
-                "pixel_size": [4.65e-6,4.65e-6],
+                "resolution": [
+                    1392,
+                    1040
+                ],
+                "pixel_size": [
+                    12.66e-6,
+                    12.66e-6
+                ],
                 "is_active": true
             }
         ]

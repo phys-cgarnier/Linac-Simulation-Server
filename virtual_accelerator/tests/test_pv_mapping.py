@@ -29,7 +29,7 @@ class TestPVMapping:
             name="screen1",
             is_active=True,
             resolution=[10, 10],
-            pixel_size=torch.tensor([0.1, 0.1]),
+            pixel_size=torch.tensor([0.1, 0.1])*1e-6, # should be in units of meters
         )
         tcav1 = TransverseDeflectingCavity(
             name="tcav1",
@@ -76,7 +76,7 @@ class TestPVMapping:
             "hcor1:BACT": 0.4,
             "vcor1:BACT": 0.5,
             "screen1:Image:ArrayData": [1, 2, 3],
-            "screen1:RESOLUTION": [0.1, 0.1],
+            "screen1:RESOLUTION": [0.1, 0.1], # should be in units of microns
             "screen1:Image:ArraySize2_RBV": [4, 5],
         }
 
