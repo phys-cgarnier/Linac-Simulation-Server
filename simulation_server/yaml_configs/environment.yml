@@ -1,0 +1,21 @@
+name: linac-simulation
+channels:
+  - conda-forge
+  - paulscherrerinstitute
+dependencies:
+  - python=3.11
+  - epics-base
+  - jupyter
+  - jupyterlab
+  - numpy
+  - openmpi
+  - openpmd-beamphysics
+  - pcaspy
+  - pip
+  - pydantic>2.3
+  - pyepics
+  - pytorch
+  - pip:
+    - git+https://github.com/slaclab/ml-tto
+    - git+https://github.com/desy-ml/cheetah
+    - p4p

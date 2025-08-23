@@ -1,0 +1,722 @@
+bpms:
+  BPMDG000:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:136:TMIT
+        x: BPMS:DIAG0:136:X
+        y: BPMS:DIAG0:136:Y
+      control_name: BPMS:DIAG0:136
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 43.879
+      type: BPM
+  BPMDG001:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:190:TMIT
+        x: BPMS:DIAG0:190:X
+        y: BPMS:DIAG0:190:Y
+      control_name: BPMS:DIAG0:190
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 46.232
+      type: BPM
+  BPMDG002:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:210:TMIT
+        x: BPMS:DIAG0:210:X
+        y: BPMS:DIAG0:210:Y
+      control_name: BPMS:DIAG0:210
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 47.094
+      type: BPM
+  BPMDG003:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:230:TMIT
+        x: BPMS:DIAG0:230:X
+        y: BPMS:DIAG0:230:Y
+      control_name: BPMS:DIAG0:230
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 47.956
+      type: BPM
+  BPMDG004:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:270:TMIT
+        x: BPMS:DIAG0:270:X
+        y: BPMS:DIAG0:270:Y
+      control_name: BPMS:DIAG0:270
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 50.114
+      type: BPM
+  BPMDG005:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:285:TMIT
+        x: BPMS:DIAG0:285:X
+        y: BPMS:DIAG0:285:Y
+      control_name: BPMS:DIAG0:285
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 50.763
+      type: BPM
+  BPMDG008:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:370:TMIT
+        x: BPMS:DIAG0:370:X
+        y: BPMS:DIAG0:370:Y
+      control_name: BPMS:DIAG0:370
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 54.763
+      type: BPM
+  BPMDG009:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:390:TMIT
+        x: BPMS:DIAG0:390:X
+        y: BPMS:DIAG0:390:Y
+      control_name: BPMS:DIAG0:390
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 55.463
+      type: BPM
+  BPMDG011:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:470:TMIT
+        x: BPMS:DIAG0:470:X
+        y: BPMS:DIAG0:470:Y
+      control_name: BPMS:DIAG0:470
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 59.233
+      type: BPM
+  BPMDG012:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:520:TMIT
+        x: BPMS:DIAG0:520:X
+        y: BPMS:DIAG0:520:Y
+      control_name: BPMS:DIAG0:520
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 61.631
+      type: BPM
+  BPMDG0RF:
+    controls_information:
+      PVs:
+        tmit: BPMS:DIAG0:330:TMIT
+        x: BPMS:DIAG0:330:X
+        y: BPMS:DIAG0:330:Y
+      control_name: BPMS:DIAG0:330
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 52.74
+      type: BPM
+magnets:
+  BKRDG0:
+    controls_information:
+      PVs:
+        bact: KICK:DIAG0:110:BACT
+        bcon: KICK:DIAG0:110:BCON
+        bctrl: KICK:DIAG0:110:BCTRL
+        bdes: KICK:DIAG0:110:BDES
+        bmax: KICK:DIAG0:110:BMAX
+        bmin: KICK:DIAG0:110:BMIN
+        ctrl: KICK:DIAG0:110:CTRL
+      control_name: KICK:DIAG0:110
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 1.0
+      sum_l_meters: 42.73
+      type: BEND
+  BLRDG0:
+    controls_information:
+      PVs:
+        bact: BEND:DIAG0:155:BACT
+        bcon: BEND:DIAG0:155:BCON
+        bctrl: BEND:DIAG0:155:BCTRL
+        bdes: BEND:DIAG0:155:BDES
+        bmax: BEND:DIAG0:155:BMAX
+        bmin: BEND:DIAG0:155:BMIN
+        ctrl: BEND:DIAG0:155:CTRL
+      control_name: BEND:DIAG0:155
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.401
+      sum_l_meters: 44.73
+      type: BEND
+  BXDG0:
+    controls_information:
+      PVs:
+        bact: BEND:DIAG0:260:BACT
+        bcon: BEND:DIAG0:260:BCON
+        bctrl: BEND:DIAG0:260:BCTRL
+        bdes: BEND:DIAG0:260:BDES
+        bmax: BEND:DIAG0:260:BMAX
+        bmin: BEND:DIAG0:260:BMIN
+        ctrl: BEND:DIAG0:260:CTRL
+      control_name: BEND:DIAG0:260
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.4
+      sum_l_meters: 49.486
+      type: BEND
+  BYDG0:
+    controls_information:
+      PVs:
+        bact: BEND:DIAG0:510:BACT
+        bcon: BEND:DIAG0:510:BCON
+        bctrl: BEND:DIAG0:510:BCTRL
+        bdes: BEND:DIAG0:510:BDES
+        bmax: BEND:DIAG0:510:BMAX
+        bmin: BEND:DIAG0:510:BMIN
+        ctrl: BEND:DIAG0:510:CTRL
+      control_name: BEND:DIAG0:510
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.543
+      sum_l_meters: 60.964
+      type: BEND
+  QDG001:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:190:BACT
+        bcon: QUAD:DIAG0:190:BCON
+        bctrl: QUAD:DIAG0:190:BCTRL
+        bdes: QUAD:DIAG0:190:BDES
+        bmax: QUAD:DIAG0:190:BMAX
+        bmin: QUAD:DIAG0:190:BMIN
+        ctrl: QUAD:DIAG0:190:CTRL
+      control_name: QUAD:DIAG0:190
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.197
+      sum_l_meters: 46.232
+      type: QUAD
+  QDG002:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:210:BACT
+        bcon: QUAD:DIAG0:210:BCON
+        bctrl: QUAD:DIAG0:210:BCTRL
+        bdes: QUAD:DIAG0:210:BDES
+        bmax: QUAD:DIAG0:210:BMAX
+        bmin: QUAD:DIAG0:210:BMIN
+        ctrl: QUAD:DIAG0:210:CTRL
+      control_name: QUAD:DIAG0:210
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.197
+      sum_l_meters: 47.094
+      type: QUAD
+  QDG003:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:230:BACT
+        bcon: QUAD:DIAG0:230:BCON
+        bctrl: QUAD:DIAG0:230:BCTRL
+        bdes: QUAD:DIAG0:230:BDES
+        bmax: QUAD:DIAG0:230:BMAX
+        bmin: QUAD:DIAG0:230:BMIN
+        ctrl: QUAD:DIAG0:230:CTRL
+      control_name: QUAD:DIAG0:230
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.197
+      sum_l_meters: 47.956
+      type: QUAD
+  QDG004:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:270:BACT
+        bcon: QUAD:DIAG0:270:BCON
+        bctrl: QUAD:DIAG0:270:BCTRL
+        bdes: QUAD:DIAG0:270:BDES
+        bmax: QUAD:DIAG0:270:BMAX
+        bmin: QUAD:DIAG0:270:BMIN
+        ctrl: QUAD:DIAG0:270:CTRL
+      control_name: QUAD:DIAG0:270
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.108
+      sum_l_meters: 50.114
+      type: QUAD
+  QDG005:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:285:BACT
+        bcon: QUAD:DIAG0:285:BCON
+        bctrl: QUAD:DIAG0:285:BCTRL
+        bdes: QUAD:DIAG0:285:BDES
+        bmax: QUAD:DIAG0:285:BMAX
+        bmin: QUAD:DIAG0:285:BMIN
+        ctrl: QUAD:DIAG0:285:CTRL
+      control_name: QUAD:DIAG0:285
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.108
+      sum_l_meters: 50.763
+      type: QUAD
+  QDG006:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:300:BACT
+        bcon: QUAD:DIAG0:300:BCON
+        bctrl: QUAD:DIAG0:300:BCTRL
+        bdes: QUAD:DIAG0:300:BDES
+        bmax: QUAD:DIAG0:300:BMAX
+        bmin: QUAD:DIAG0:300:BMIN
+        ctrl: QUAD:DIAG0:300:CTRL
+      control_name: QUAD:DIAG0:300
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.108
+      sum_l_meters: 51.463
+      type: QUAD
+  QDG007:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:360:BACT
+        bcon: QUAD:DIAG0:360:BCON
+        bctrl: QUAD:DIAG0:360:BCTRL
+        bdes: QUAD:DIAG0:360:BDES
+        bmax: QUAD:DIAG0:360:BMAX
+        bmin: QUAD:DIAG0:360:BMIN
+        ctrl: QUAD:DIAG0:360:CTRL
+      control_name: QUAD:DIAG0:360
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.108
+      sum_l_meters: 54.063
+      type: QUAD
+  QDG008:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:370:BACT
+        bcon: QUAD:DIAG0:370:BCON
+        bctrl: QUAD:DIAG0:370:BCTRL
+        bdes: QUAD:DIAG0:370:BDES
+        bmax: QUAD:DIAG0:370:BMAX
+        bmin: QUAD:DIAG0:370:BMIN
+        ctrl: QUAD:DIAG0:370:CTRL
+      control_name: QUAD:DIAG0:370
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.108
+      sum_l_meters: 54.763
+      type: QUAD
+  QDG009:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:390:BACT
+        bcon: QUAD:DIAG0:390:BCON
+        bctrl: QUAD:DIAG0:390:BCTRL
+        bdes: QUAD:DIAG0:390:BDES
+        bmax: QUAD:DIAG0:390:BMAX
+        bmin: QUAD:DIAG0:390:BMIN
+        ctrl: QUAD:DIAG0:390:CTRL
+      control_name: QUAD:DIAG0:390
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.108
+      sum_l_meters: 55.463
+      type: QUAD
+  QDG010:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:455:BACT
+        bcon: QUAD:DIAG0:455:BCON
+        bctrl: QUAD:DIAG0:455:BCTRL
+        bdes: QUAD:DIAG0:455:BDES
+        bmax: QUAD:DIAG0:455:BMAX
+        bmin: QUAD:DIAG0:455:BMIN
+        ctrl: QUAD:DIAG0:455:CTRL
+      control_name: QUAD:DIAG0:455
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.108
+      sum_l_meters: 58.533
+      type: QUAD
+  QDG011:
+    controls_information:
+      PVs:
+        bact: QUAD:DIAG0:470:BACT
+        bcon: QUAD:DIAG0:470:BCON
+        bctrl: QUAD:DIAG0:470:BCTRL
+        bdes: QUAD:DIAG0:470:BDES
+        bmax: QUAD:DIAG0:470:BMAX
+        bmin: QUAD:DIAG0:470:BMIN
+        ctrl: QUAD:DIAG0:470:CTRL
+      control_name: QUAD:DIAG0:470
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.108
+      sum_l_meters: 59.233
+      type: QUAD
+  XCDG001:
+    controls_information:
+      PVs:
+        bact: XCOR:DIAG0:178:BACT
+        bcon: XCOR:DIAG0:178:BCON
+        bctrl: XCOR:DIAG0:178:BCTRL
+        bdes: XCOR:DIAG0:178:BDES
+        bmax: XCOR:DIAG0:178:BMAX
+        bmin: XCOR:DIAG0:178:BMIN
+        ctrl: XCOR:DIAG0:178:CTRL
+      control_name: XCOR:DIAG0:178
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 45.883
+      type: XCOR
+  XCDG002:
+    controls_information:
+      PVs:
+        bact: XCOR:DIAG0:218:BACT
+        bcon: XCOR:DIAG0:218:BCON
+        bctrl: XCOR:DIAG0:218:BCTRL
+        bdes: XCOR:DIAG0:218:BDES
+        bmax: XCOR:DIAG0:218:BMAX
+        bmin: XCOR:DIAG0:218:BMIN
+        ctrl: XCOR:DIAG0:218:CTRL
+      control_name: XCOR:DIAG0:218
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 47.607
+      type: XCOR
+  XCDG003:
+    controls_information:
+      PVs:
+        bact: XCOR:DIAG0:280:BACT
+        bcon: XCOR:DIAG0:280:BCON
+        bctrl: XCOR:DIAG0:280:BCTRL
+        bdes: XCOR:DIAG0:280:BDES
+        bmax: XCOR:DIAG0:280:BMAX
+        bmin: XCOR:DIAG0:280:BMIN
+        ctrl: XCOR:DIAG0:280:CTRL
+      control_name: XCOR:DIAG0:280
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 50.439
+      type: XCOR
+  XCDG005:
+    controls_information:
+      PVs:
+        bact: XCOR:DIAG0:290:BACT
+        bcon: XCOR:DIAG0:290:BCON
+        bctrl: XCOR:DIAG0:290:BCTRL
+        bdes: XCOR:DIAG0:290:BDES
+        bmax: XCOR:DIAG0:290:BMAX
+        bmin: XCOR:DIAG0:290:BMIN
+        ctrl: XCOR:DIAG0:290:CTRL
+      control_name: XCOR:DIAG0:290
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 51.113
+      type: XCOR
+  XCDG008:
+    controls_information:
+      PVs:
+        bact: XCOR:DIAG0:380:BACT
+        bcon: XCOR:DIAG0:380:BCON
+        bctrl: XCOR:DIAG0:380:BCTRL
+        bdes: XCOR:DIAG0:380:BDES
+        bmax: XCOR:DIAG0:380:BMAX
+        bmin: XCOR:DIAG0:380:BMIN
+        ctrl: XCOR:DIAG0:380:CTRL
+      control_name: XCOR:DIAG0:380
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 55.113
+      type: XCOR
+  XCDG010:
+    controls_information:
+      PVs:
+        bact: XCOR:DIAG0:460:BACT
+        bcon: XCOR:DIAG0:460:BCON
+        bctrl: XCOR:DIAG0:460:BCTRL
+        bdes: XCOR:DIAG0:460:BDES
+        bmax: XCOR:DIAG0:460:BMAX
+        bmin: XCOR:DIAG0:460:BMIN
+        ctrl: XCOR:DIAG0:460:CTRL
+      control_name: XCOR:DIAG0:460
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 58.883
+      type: XCOR
+  YCDG001:
+    controls_information:
+      PVs:
+        bact: YCOR:DIAG0:199:BACT
+        bcon: YCOR:DIAG0:199:BCON
+        bctrl: YCOR:DIAG0:199:BCTRL
+        bdes: YCOR:DIAG0:199:BDES
+        bmax: YCOR:DIAG0:199:BMAX
+        bmin: YCOR:DIAG0:199:BMIN
+        ctrl: YCOR:DIAG0:199:CTRL
+      control_name: YCOR:DIAG0:199
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 46.745
+      type: YCOR
+  YCDG002:
+    controls_information:
+      PVs:
+        bact: YCOR:DIAG0:247:BACT
+        bcon: YCOR:DIAG0:247:BCON
+        bctrl: YCOR:DIAG0:247:BCTRL
+        bdes: YCOR:DIAG0:247:BDES
+        bmax: YCOR:DIAG0:247:BMAX
+        bmin: YCOR:DIAG0:247:BMIN
+        ctrl: YCOR:DIAG0:247:CTRL
+      control_name: YCOR:DIAG0:247
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 48.832
+      type: YCOR
+  YCDG003:
+    controls_information:
+      PVs:
+        bact: YCOR:DIAG0:280:BACT
+        bcon: YCOR:DIAG0:280:BCON
+        bctrl: YCOR:DIAG0:280:BCTRL
+        bdes: YCOR:DIAG0:280:BDES
+        bmax: YCOR:DIAG0:280:BMAX
+        bmin: YCOR:DIAG0:280:BMIN
+        ctrl: YCOR:DIAG0:280:CTRL
+      control_name: YCOR:DIAG0:280
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 50.439
+      type: YCOR
+  YCDG005:
+    controls_information:
+      PVs:
+        bact: YCOR:DIAG0:290:BACT
+        bcon: YCOR:DIAG0:290:BCON
+        bctrl: YCOR:DIAG0:290:BCTRL
+        bdes: YCOR:DIAG0:290:BDES
+        bmax: YCOR:DIAG0:290:BMAX
+        bmin: YCOR:DIAG0:290:BMIN
+        ctrl: YCOR:DIAG0:290:CTRL
+      control_name: YCOR:DIAG0:290
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 51.113
+      type: YCOR
+  YCDG008:
+    controls_information:
+      PVs:
+        bact: YCOR:DIAG0:380:BACT
+        bcon: YCOR:DIAG0:380:BCON
+        bctrl: YCOR:DIAG0:380:BCTRL
+        bdes: YCOR:DIAG0:380:BDES
+        bmax: YCOR:DIAG0:380:BMAX
+        bmin: YCOR:DIAG0:380:BMIN
+        ctrl: YCOR:DIAG0:380:CTRL
+      control_name: YCOR:DIAG0:380
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 55.113
+      type: YCOR
+  YCDG010:
+    controls_information:
+      PVs:
+        bact: YCOR:DIAG0:460:BACT
+        bcon: YCOR:DIAG0:460:BCON
+        bctrl: YCOR:DIAG0:460:BCTRL
+        bdes: YCOR:DIAG0:460:BDES
+        bmax: YCOR:DIAG0:460:BMAX
+        bmin: YCOR:DIAG0:460:BMIN
+        ctrl: YCOR:DIAG0:460:CTRL
+      control_name: YCOR:DIAG0:460
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.0
+      sum_l_meters: 58.883
+      type: YCOR
+screens:
+  OTRDG02:
+    controls_information:
+      PVs:
+        image: OTRS:DIAG0:420:Image:ArrayData
+        n_bits: OTRS:DIAG0:420:N_OF_BITS
+        n_col: OTRS:DIAG0:420:Image:ArraySize1_RBV
+        n_row: OTRS:DIAG0:420:Image:ArraySize0_RBV
+        pneumatic: OTRS:DIAG0:420:PNEUMATIC
+        ref_rate: OTRS:DIAG0:420:ArrayRate_RBV
+        ref_rate_vme: OTRS:DIAG0:420:FRAME_RATE
+        resolution: OTRS:DIAG0:420:RESOLUTION
+        sys_type: OTRS:DIAG0:420:SYS_TYPE
+      control_name: OTRS:DIAG0:420
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 56.813
+      type: PROF
+  OTRDG04:
+    controls_information:
+      PVs:
+        image: OTRS:DIAG0:525:Image:ArrayData
+        n_bits: OTRS:DIAG0:525:N_OF_BITS
+        n_col: OTRS:DIAG0:525:Image:ArraySize1_RBV
+        n_row: OTRS:DIAG0:525:Image:ArraySize0_RBV
+        pneumatic: OTRS:DIAG0:525:PNEUMATIC
+        ref_rate: OTRS:DIAG0:525:ArrayRate_RBV
+        ref_rate_vme: OTRS:DIAG0:525:FRAME_RATE
+        resolution: OTRS:DIAG0:525:RESOLUTION
+        sys_type: OTRS:DIAG0:525:SYS_TYPE
+      control_name: OTRS:DIAG0:525
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 61.871
+      type: PROF
+tcavs:
+  TCXDG0:
+    controls_information:
+      PVs:
+        amp_fbenb: TCAV:DIAG0:11:AFBENB
+        amp_fbst: TCAV:DIAG0:11:AFBST
+        amp_set: TCAV:DIAG0:11:AREQ
+        mode_config: TCAV:DIAG0:11:MODECFG
+        phase_fbenb: TCAV:DIAG0:11:PFBENB
+        phase_fbst: TCAV:DIAG0:11:PFBST
+        phase_set: TCAV:DIAG0:11:PREQ
+        rf_enable: TCAV:DIAG0:11:RF_ENABLE
+      control_name: TCAV:DIAG0:11
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      l_eff: 0.8
+      rf_freq: 2856
+      sum_l_meters: 53.313
+      type: LCAV
+wires:
+  WSDG01:
+    controls_information:
+      PVs:
+        abort_scan: WIRE:DIAG0:424:MOTR.STOP
+        motor: WIRE:DIAG0:424:MOTR
+        position: WIRE:DIAG0:424:MOTR.RBV
+        scan_pulses: WIRE:DIAG0:424:SCANPULSES
+        speed: WIRE:DIAG0:424:MOTR.VELO
+        speed_max: WIRE:DIAG0:424:MOTR.VMAX
+        speed_min: WIRE:DIAG0:424:MOTR.VBAS
+        start_scan: WIRE:DIAG0:424:STARTSCAN
+        u_size: WIRE:DIAG0:424:UWIRESIZE
+        u_wire_inner: WIRE:DIAG0:424:UWIREINNER
+        u_wire_outer: WIRE:DIAG0:424:UWIREOUTER
+        use_u_wire: WIRE:DIAG0:424:USEUWIRE
+        use_x_wire: WIRE:DIAG0:424:USEXWIRE
+        use_y_wire: WIRE:DIAG0:424:USEYWIRE
+        x_size: WIRE:DIAG0:424:XWIRESIZE
+        x_wire_inner: WIRE:DIAG0:424:XWIREINNER
+        x_wire_outer: WIRE:DIAG0:424:XWIREOUTER
+        y_size: WIRE:DIAG0:424:YWIRESIZE
+        y_wire_inner: WIRE:DIAG0:424:YWIREINNER
+        y_wire_outer: WIRE:DIAG0:424:YWIREOUTER
+      control_name: WIRE:DIAG0:424
+    metadata:
+      area: DIAG0
+      beam_path:
+      - SC_DIAG0
+      sum_l_meters: 57.113
+      type: WIRE
