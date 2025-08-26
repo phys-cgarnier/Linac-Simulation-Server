@@ -32,6 +32,8 @@ def get_magnetic_rigidity(energy):
 
 # define mappings for different element types 
 
+BCTRL_LIMIT = 100.0
+
 # -- include conversions for cheetah attributes to SLAC EPICS attributes
 QUADRUPOLE_MAPPING = {
     "BCTRL": FieldAccessor(
@@ -41,8 +43,10 @@ QUADRUPOLE_MAPPING = {
     "BACT": FieldAccessor(
         lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy)
     ),
-    "BMAX": FieldAccessor(lambda e, energy: 20.0),
-    "BMIN": FieldAccessor(lambda e, energy: -20.0),
+    "BMAX": FieldAccessor(lambda e, energy: BCTRL_LIMIT),
+    "BMIN": FieldAccessor(lambda e, energy: -BCTRL_LIMIT),
+    "BCTRL.DRVL": FieldAccessor(lambda e, energy: -BCTRL_LIMIT),
+    "BCTRL.DRVH": FieldAccessor(lambda e, energy: BCTRL_LIMIT),
     "CTRL": FieldAccessor(lambda e, energy: "Ready"),
     "BCON": FieldAccessor(lambda e, energy: 1.0),
     "BDES": FieldAccessor(lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy)),
@@ -51,8 +55,10 @@ QUADRUPOLE_MAPPING = {
 SOLENOID_MAPPING = {
     "BCTRL": FieldAccessor(lambda e, energy: e.k * get_magnetic_rigidity(energy), lambda e, energy, k: setattr(e, "k", k / (2*get_magnetic_rigidity(energy)))),
     "BACT": FieldAccessor(lambda e, energy: e.k * get_magnetic_rigidity(energy)),
-    "BMAX": FieldAccessor(lambda e, energy: 20.0),
-    "BMIN": FieldAccessor(lambda e, energy: -20.0),
+    "BMAX": FieldAccessor(lambda e, energy: BCTRL_LIMIT),
+    "BMIN": FieldAccessor(lambda e, energy: -BCTRL_LIMIT),
+    "BCTRL.DRVL": FieldAccessor(lambda e, energy: -BCTRL_LIMIT),
+    "BCTRL.DRVH": FieldAccessor(lambda e, energy: BCTRL_LIMIT),
     "CTRL": FieldAccessor(lambda e, energy: "Ready"),
     "BCON": FieldAccessor(lambda e, energy: 1.0),
     "BDES": FieldAccessor(lambda e, energy: e.k * get_magnetic_rigidity(energy)),
@@ -61,8 +67,10 @@ SOLENOID_MAPPING = {
 CORRECTOR_MAPPING = {
     "BCTRL": FieldAccessor(lambda e, energy: e.angle * get_magnetic_rigidity(energy), lambda e, energy, a: setattr(e, "angle", a / get_magnetic_rigidity(energy))),
     "BACT": FieldAccessor(lambda e, energy: e.angle * get_magnetic_rigidity(energy)),
-    "BMAX": FieldAccessor(lambda e, energy: 20.0),
-    "BMIN": FieldAccessor(lambda e, energy: -20.0),
+    "BMAX": FieldAccessor(lambda e, energy: BCTRL_LIMIT),
+    "BMIN": FieldAccessor(lambda e, energy: -BCTRL_LIMIT),
+    "BCTRL.DRVL": FieldAccessor(lambda e, energy: -BCTRL_LIMIT),
+    "BCTRL.DRVH": FieldAccessor(lambda e, energy: BCTRL_LIMIT),
     "CTRL": FieldAccessor(lambda e, energy: "Ready"),
     "BCON": FieldAccessor(lambda e, energy: 1.0),
     "BDES": FieldAccessor(lambda e, energy: e.angle * get_magnetic_rigidity(energy)),
