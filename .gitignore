@@ -7,8 +7,5 @@
 __pycache__/
 .ipynb_checkpoints/
 
-# Generated
-impact_inj_output_YAG03.h5
-
 *.png
 dev/*
