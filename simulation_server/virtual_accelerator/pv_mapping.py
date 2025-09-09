@@ -1,8 +1,10 @@
 import pandas as pd
 import torch
 
+
 class NoSetMethodError(Exception):
     pass
+
 
 class FieldAccessor:
     """
@@ -19,7 +21,7 @@ class FieldAccessor:
 
     def __call__(self, element, energy, value=None):
         if value is None:
-            return self.get(element,energy)
+            return self.get(element, energy)
         else:
             if self.set is None:
                 raise NoSetMethodError(f"Cannot set value for this attribute")
@@ -32,15 +34,18 @@ def get_magnetic_rigidity(energy):
     """
     return 33.356 * energy / 1e9
 
-# define mappings for different element types 
+
+# define mappings for different element types
 
 BCTRL_LIMIT = 100.0
 
 # -- include conversions for cheetah attributes to SLAC EPICS attributes
 QUADRUPOLE_MAPPING = {
     "BCTRL": FieldAccessor(
-        lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy), 
-        lambda e, energy, k1: setattr(e, "k1", k1 / get_magnetic_rigidity(energy) / e.length)
+        lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy),
+        lambda e, energy, k1: setattr(
+            e, "k1", k1 / get_magnetic_rigidity(energy) / e.length
+        ),
     ),
     "BACT": FieldAccessor(
         lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy)
@@ -51,11 +56,16 @@ QUADRUPOLE_MAPPING = {
     "BCTRL.DRVH": FieldAccessor(lambda e, energy: BCTRL_LIMIT),
     "CTRL": FieldAccessor(lambda e, energy: "Ready"),
     "BCON": FieldAccessor(lambda e, energy: 1.0),
-    "BDES": FieldAccessor(lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy)),
+    "BDES": FieldAccessor(
+        lambda e, energy: e.k1 * e.length * get_magnetic_rigidity(energy)
+    ),
 }
 
 SOLENOID_MAPPING = {
-    "BCTRL": FieldAccessor(lambda e, energy: e.k * get_magnetic_rigidity(energy), lambda e, energy, k: setattr(e, "k", k / (2*get_magnetic_rigidity(energy)))),
+    "BCTRL": FieldAccessor(
+        lambda e, energy: e.k * get_magnetic_rigidity(energy),
+        lambda e, energy, k: setattr(e, "k", k / (2 * get_magnetic_rigidity(energy))),
+    ),
     "BACT": FieldAccessor(lambda e, energy: e.k * get_magnetic_rigidity(energy)),
     "BMAX": FieldAccessor(lambda e, energy: BCTRL_LIMIT),
     "BMIN": FieldAccessor(lambda e, energy: -BCTRL_LIMIT),
@@ -67,7 +77,10 @@ SOLENOID_MAPPING = {
 }
 
 CORRECTOR_MAPPING = {
-    "BCTRL": FieldAccessor(lambda e, energy: e.angle * get_magnetic_rigidity(energy), lambda e, energy, a: setattr(e, "angle", a / get_magnetic_rigidity(energy))),
+    "BCTRL": FieldAccessor(
+        lambda e, energy: e.angle * get_magnetic_rigidity(energy),
+        lambda e, energy, a: setattr(e, "angle", a / get_magnetic_rigidity(energy)),
+    ),
     "BACT": FieldAccessor(lambda e, energy: e.angle * get_magnetic_rigidity(energy)),
     "BMAX": FieldAccessor(lambda e, energy: BCTRL_LIMIT),
     "BMIN": FieldAccessor(lambda e, energy: -BCTRL_LIMIT),
@@ -88,7 +101,7 @@ TRANSVERSE_DEFLECTING_CAVITY_MAPPING = {
     "PACT_AVGNT": FieldAccessor(lambda e, energy: 0.0),
     "PFBENB": FieldAccessor(lambda e, energy: 0.0),
     "PFBST": FieldAccessor(lambda e, energy: 0.0),
-    "RF_ENABLE": FieldAccessor(lambda e, energy: 1.0)
+    "RF_ENABLE": FieldAccessor(lambda e, energy: 1.0),
 }
 
 BPM_MAPPING = {
@@ -105,7 +118,7 @@ SCREEN_MAPPING = {
     "PNEUMATIC": "is_active",
     "Image:ArraySize1_RBV": FieldAccessor(lambda e, energy: e.resolution[0]),
     "Image:ArraySize0_RBV": FieldAccessor(lambda e, energy: e.resolution[1]),
-    "RESOLUTION": FieldAccessor(lambda e, energy: e.pixel_size[0]*1e6),
+    "RESOLUTION": FieldAccessor(lambda e, energy: e.pixel_size[0] * 1e6),
 }
 
 MAPPINGS = {
@@ -158,13 +171,17 @@ def access_cheetah_attribute(element, pv_attribute, energy, set_value=None):
             try:
                 setattr(element, accessor, set_value)
             except NoSetMethodError as e:
-                raise ValueError(f"Cannot set value for {pv_attribute} of element type {element_type}") from e
+                raise ValueError(
+                    f"Cannot set value for {pv_attribute} of element type {element_type}"
+                ) from e
 
     elif isinstance(accessor, FieldAccessor):
         try:
             return accessor(element, energy, set_value)
         except NoSetMethodError as e:
-            raise ValueError(f"Cannot set value for {pv_attribute} of element type {element_type}") from e
+            raise ValueError(
+                f"Cannot set value for {pv_attribute} of element type {element_type}"
+            ) from e
 
 
 def get_pv_mad_mapping(fname):

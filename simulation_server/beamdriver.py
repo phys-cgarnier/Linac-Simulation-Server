@@ -254,10 +254,7 @@ class SimServer(SimpleServer):
 
 class SimDriver(Driver):
     def __init__(
-        self,
-        server: SimServer,
-        devices: dict,
-        virtual_accelerator: VirtualAccelerator
+        self, server: SimServer, devices: dict, virtual_accelerator: VirtualAccelerator
     ):
         super().__init__()
         self.virtual_accelerator = virtual_accelerator
@@ -271,11 +268,13 @@ class SimDriver(Driver):
 
         # initialize ALL pvs with values
         key_list = list(self.server.pva_pvs.keys())
-        key_list = [k for k in key_list if not "." in k]  # filter out keys with attributes
+        key_list = [
+            k for k in key_list if not "." in k
+        ]  # filter out keys with attributes
         self.update_pvs(key_list)
 
     def get_measurement_pvs(self):
-        """ Get a list of PVs that should be updated every time we write to a PV """
+        """Get a list of PVs that should be updated every time we write to a PV"""
         key_list = list(self.server.pva_pvs.keys())
 
         # filter out keys with attributes
@@ -283,8 +282,20 @@ class SimDriver(Driver):
 
         # filter out keys that will not be updated
         ignore_flags = [
-            "BMAX", "BMIN", "BDES", "BCON", "ArraySize0_RBV", "ArraySize1_RBV",
-            "RESOLUTION", "ENB", "BST", "MODE", "ENABLE", "REQ", "CTRL", "TMIT"
+            "BMAX",
+            "BMIN",
+            "BDES",
+            "BCON",
+            "ArraySize0_RBV",
+            "ArraySize1_RBV",
+            "RESOLUTION",
+            "ENB",
+            "BST",
+            "MODE",
+            "ENABLE",
+            "REQ",
+            "CTRL",
+            "TMIT",
         ]
         key_list = [k for k in key_list if not any(flag in k for flag in ignore_flags)]
 
@@ -294,10 +305,10 @@ class SimDriver(Driver):
         print("Updating PVs...")
         for name in pv_list:
             self.read(name)
-        print("PVs updated.")   
+        print("PVs updated.")
 
     def read(self, reason):
-        value =  self.virtual_accelerator.get_pvs([reason])[reason]
+        value = self.virtual_accelerator.get_pvs([reason])[reason]
         self.server.set_pv(reason, value)
         try:
             self.setParam(reason, value)
