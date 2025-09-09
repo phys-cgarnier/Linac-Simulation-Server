@@ -1,9 +1,16 @@
+import numpy as np
 from copy import deepcopy
+
+import torch
 from cheetah.accelerator import Segment, Screen
 from cheetah.particles import ParticleBeam
 from matplotlib import pyplot as plt
-import torch
-from simulation_server.virtual_accelerator.pv_mapping import access_cheetah_attribute, get_pv_mad_mapping
+
+from simulation_server.virtual_accelerator.pv_mapping import (
+    access_cheetah_attribute,
+    get_pv_mad_mapping,
+)
+from simulation_server.virtual_accelerator.utils import add_noise
 
 
 class VirtualAccelerator:
@@ -14,9 +21,10 @@ class VirtualAccelerator:
         initial_beam_distribution,
         beam_shutter_pv=None,
         monitor_overview=False,
+        measurement_noise_level=None,
     ):
         """
-        Virtual accelerator class based on cheetah beam dynamics simulations. 
+        Virtual accelerator class based on cheetah beam dynamics simulations.
         Runs a new cheetah tracking simulation any time a process variable (PV) is updated.
 
         Parameters
@@ -24,23 +32,27 @@ class VirtualAccelerator:
         lattice_file : str
             Path to the cheetah lattice JSON file.
         mapping_file : str
-            Path to the mapping CSV file that maps PV base names 
+            Path to the mapping CSV file that maps PV base names
             to corresponding MAD names used in cheetah.
         initial_beam_distribution : ParticleBeam
             Initial beam distribution to be used in the simulation.
         beam_shutter_pv : str, optional
             Process variable (PV) name for the beam shutter.
         monitor_overview : bool, optional
-            Whether to monitor the overview of the simulation. If True, the overview 
+            Whether to monitor the overview of the simulation. If True, the overview
             plot from cheetah will be generated and saved every time a new simulation is run.
+        measurement_noise_level : float, optional
+            If provided, adds realistic noise to measurements.
+            See `simulation_server.virtual_accelerator.utils.add_noise` for details.
 
         """
         self.lattice_file = lattice_file
         self.mapping_file = mapping_file
+        self.measurement_noise_level = measurement_noise_level
 
         lattice = Segment.from_lattice_json(lattice_file)
 
-        #change screen reading method to histogram
+        # change screen reading method to histogram
         for ele in lattice.elements:
             if isinstance(ele, Screen):
                 ele.method = "histogram"
@@ -71,7 +83,7 @@ class VirtualAccelerator:
             fig.savefig(f"simulation_overview_{self._monitor_index:04d}.png")
 
     def reset(self):
-        """ reset the simulation """
+        """reset the simulation"""
         print("resetting the simulation")
 
         self.lattice = Segment.from_lattice_json(self.lattice_file)
@@ -88,7 +100,7 @@ class VirtualAccelerator:
         """
         Get the energy of the beam in the virtual accelerator simulator at
         every element for use in calculating the magnetic rigidity.
-        
+
         Note: need to track on a copy of the lattice to not influence readings!
         """
         test_beam = ParticleBeam(
@@ -152,7 +164,14 @@ class VirtualAccelerator:
                     element = element[0]
 
                 try:
-                    print("accessing element " + element.name + " to set PV " + pv_name + " to " + str(value))
+                    print(
+                        "accessing element "
+                        + element.name
+                        + " to set PV "
+                        + pv_name
+                        + " to "
+                        + str(value)
+                    )
                     access_cheetah_attribute(element, attribute_name, energy, value)
                 except ValueError as e:
                     raise ValueError(f"Failed to set PV {pv_name}: {str(e)}") from e
@@ -223,5 +242,14 @@ class VirtualAccelerator:
                     values[name] = ele.item()
                 elif len(ele.shape) > 0:
                     values[name] = ele.flatten().tolist()
+
+        # add noise to signals if requested
+        if self.measurement_noise_level is not None:
+            for name, ele in values.items():
+                if isinstance(ele, list):
+                    noisy_signal = add_noise(
+                        np.array(ele), noise_level=self.measurement_noise_level
+                    )
+                    values[name] = noisy_signal.tolist()
 
         return values

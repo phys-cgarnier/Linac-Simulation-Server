@@ -8,7 +8,8 @@ from simulation_server.virtual_accelerator import VirtualAccelerator
 
 FILEPATH = pathlib.Path(__file__).parent.resolve()
 
-def get_virtual_accelerator(name, monitor_overview=False):
+
+def get_virtual_accelerator(name, monitor_overview=False, measurement_noise_level=None):
     """
     Create an instance of VirtualAccelerator for a given beamline.
 
@@ -19,8 +20,11 @@ def get_virtual_accelerator(name, monitor_overview=False):
             - diag0
             - cu_injector
     monitor_overview: bool, optional
-        If True, print out an overview plot of the accelerator 
+        If True, print out an overview plot of the accelerator
         simulation each time a PV is changed.
+    measurement_noise_level: float, optional
+        If provided, adds realistic noise to measurements.
+        See `simulation_server.virtual_accelerator.utils.add_noise` for details.
 
     Returns
     -------
@@ -47,8 +51,8 @@ def get_virtual_accelerator(name, monitor_overview=False):
     elif name == "nc_injector":
         incoming_beam = ParticleBeam.from_openpmd_file(
             path=os.path.join(FILEPATH, "beams", "impact_inj_output_YAG03.h5"),
-            energy = torch.tensor(135e6),
-            dtype=torch.float32
+            energy=torch.tensor(64e6),
+            dtype=torch.float32,
         )
         incoming_beam.particle_charges = torch.tensor(1.0)
 
@@ -56,8 +60,9 @@ def get_virtual_accelerator(name, monitor_overview=False):
         lattice_file = os.path.join(FILEPATH, "lattices", "lcls_cu_segment_otr2.json")
 
     return VirtualAccelerator(
-            lattice_file=lattice_file,
-            initial_beam_distribution=incoming_beam,
-            mapping_file=mapping_file,
-            monitor_overview=monitor_overview,
-        )
+        lattice_file=lattice_file,
+        initial_beam_distribution=incoming_beam,
+        mapping_file=mapping_file,
+        monitor_overview=monitor_overview,
+        measurement_noise_level=measurement_noise_level,
+    )
