@@ -14,6 +14,7 @@ $ cd Linac-Simulation-Server/yaml_configs
 $ source /sdf/group/cds/sw/epics/users/ernesto/sandbox/ML_Physics/conda-local-activate.sh
 $ conda env create -f environment.yml
 $ conda activate linac-simulation
+$ source /afs/slac/g/lcls/tools/script/ENVS64.bash
 ```
 
 ### Run the simulated server:
@@ -30,6 +31,7 @@ Make sure you source this script before attempting to access PVs using caget/pvg
 
 ```
 $ cd Linac-Simulation-Server/
+$ source /afs/slac/g/lcls/tools/script/ENVS64.bash
 $ source epics-env.sh
 ```
 It is _not_ necessary to source epics_env.sh before running `start.sh`, as that setup is handled automatically by `start.sh`
@@ -42,7 +44,11 @@ $ cd Badger-Resources/cu_hxr
 $ badger -g -cf config.yaml
 ```
 
-Please update config.yaml with correct paths. 
+Please update config.yaml with correct paths. Choose nc_inj_emit environment. Choose process variables and use emittance_x as objective. Before pressing run, set measure_background to false. 
+
+<br/>
+<img src="Screenshot.png" alt="drawing" width="1000"/>
+<br/><br/>
 
 **Warning** Not all PVs are currently supported in the Linac Simulation Server.
 
