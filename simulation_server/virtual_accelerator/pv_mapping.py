@@ -1,6 +1,8 @@
 import pandas as pd
 import torch
 
+class NoSetMethodError(Exception):
+    pass
 
 class FieldAccessor:
     """
@@ -20,7 +22,7 @@ class FieldAccessor:
             return self.get(element,energy)
         else:
             if self.set is None:
-                raise ValueError("Cannot set value for.")
+                raise NoSetMethodError(f"Cannot set value for this attribute")
             self.set(element, energy, value)
 
 
@@ -153,10 +155,16 @@ def access_cheetah_attribute(element, pv_attribute, energy, set_value=None):
         if set_value is None:
             return getattr(element, accessor)
         else:
-            setattr(element, accessor, set_value)
+            try:
+                setattr(element, accessor, set_value)
+            except NoSetMethodError as e:
+                raise ValueError(f"Cannot set value for {pv_attribute} of element type {element_type}") from e
 
     elif isinstance(accessor, FieldAccessor):
-        return accessor(element, energy, set_value)
+        try:
+            return accessor(element, energy, set_value)
+        except NoSetMethodError as e:
+            raise ValueError(f"Cannot set value for {pv_attribute} of element type {element_type}") from e
 
 
 def get_pv_mad_mapping(fname):
