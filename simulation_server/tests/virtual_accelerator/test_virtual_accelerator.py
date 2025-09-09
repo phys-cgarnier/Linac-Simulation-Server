@@ -2,7 +2,7 @@ from cheetah.particles import ParticleBeam
 from cheetah.accelerator import Screen
 from matplotlib import pyplot as plt
 import torch
-from ..virtual_accelerator import VirtualAccelerator
+from simulation_server.virtual_accelerator.virtual_accelerator import VirtualAccelerator
 import os
 
 
@@ -57,7 +57,10 @@ class TestVirtualAccelerator:
         )
 
         # Verify the BACT is updated to match the BCTRL value
-        assert self.va.get_pvs(["QUAD:DIAG0:190:BACT"])["QUAD:DIAG0:190:BACT"] == values["QUAD:DIAG0:190:BCTRL"]
+        assert (
+            self.va.get_pvs(["QUAD:DIAG0:190:BACT"])["QUAD:DIAG0:190:BACT"]
+            == values["QUAD:DIAG0:190:BCTRL"]
+        )
 
         assert (
             getattr(self.va.lattice, self.va.mapping["XCOR:DIAG0:178"].lower()).angle
@@ -134,7 +137,7 @@ class TestVirtualAccelerator:
         self.va.set_shutter(False)
         assert torch.allclose(
             self.va.initial_beam_distribution.particle_charges,
-            self.va.initial_beam_distribution_charge
+            self.va.initial_beam_distribution_charge,
         )
 
         # test with shutter PV
@@ -145,7 +148,7 @@ class TestVirtualAccelerator:
         self.va.set_pvs({"BEAM:SHUTTER:STATE": False})
         assert torch.allclose(
             self.va.initial_beam_distribution.particle_charges,
-            self.va.initial_beam_distribution_charge
+            self.va.initial_beam_distribution_charge,
         )
 
         assert self.va.get_pvs(["BEAM:SHUTTER:STATE"]) == {
