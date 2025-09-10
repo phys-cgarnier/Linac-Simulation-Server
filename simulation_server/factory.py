@@ -7,6 +7,7 @@ from cheetah.particles import ParticleBeam
 from simulation_server.virtual_accelerator import VirtualAccelerator
 
 FILEPATH = pathlib.Path(__file__).parent.resolve()
+#LCLS_LATTICE = pathlib.Path(os.environ["LCLS_LATTICE"])
 
 
 def get_virtual_accelerator(name, monitor_overview=False, measurement_noise_level=None):
@@ -46,7 +47,8 @@ def get_virtual_accelerator(name, monitor_overview=False, measurement_noise_leve
         )
 
         mapping_file = os.path.join(FILEPATH, "mappings", "lcls_elements.csv")
-        lattice_file = os.path.join(FILEPATH, "lattices", "new_diag0.json")
+        lattice_file= os.path.join(FILEPATH, "lattices", "new_diag0.json")
+        #lattice_file = os.path.join(LCLS_LATTICE, "cheetah", "diag0bpm.json")
 
     elif name == "nc_injector":
         incoming_beam = ParticleBeam.from_openpmd_file(
@@ -58,6 +60,7 @@ def get_virtual_accelerator(name, monitor_overview=False, measurement_noise_leve
 
         mapping_file = os.path.join(FILEPATH, "mappings", "lcls_elements.csv")
         lattice_file = os.path.join(FILEPATH, "lattices", "lcls_cu_segment_otr2.json")
+        #lattice_file = os.path.join(LCLS_LATTICE, "cheetah", "lcls_cu.json")
 
     return VirtualAccelerator(
         lattice_file=lattice_file,

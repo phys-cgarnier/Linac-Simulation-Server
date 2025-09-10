@@ -11,7 +11,7 @@ def create_pvdb(device: dict, **default_params) -> dict:
             return pvs.get(name, f"{key}:missing_{name}")
 
         if "QUAD" in key:
-            quad_params = {
+            device_params = {
                 get_pv("bact"): {
                     "type": "float",
                     "value": 0.0,
@@ -58,19 +58,18 @@ def create_pvdb(device: dict, **default_params) -> dict:
 
             # Create DRVL/DRVH/HOPR/LOPR PVs, since pcaspy doesn't do that for us.
             new_pvs = {}
-            for k, v in quad_params.items():
+            for k, v in device_params.items():
                 for parm, val in v.items():
                     if parm in ["type", "value"]:
                         continue
                     new_pvs[f"{k}.{parm.upper()}"] = {"type": "float", "value": val}
-            quad_params.update(new_pvs)
+            device_params.update(new_pvs)
 
-            pvdb.update(quad_params)
 
         elif "OTRS" in key:
             n_row = default_params.get("n_row", 1944)
             n_col = default_params.get("n_col", 1472)
-            screen_params = {
+            device_params = {
                 get_pv("image"): {
                     "type": "float",
                     "count": n_row * n_col,
@@ -83,15 +82,13 @@ def create_pvdb(device: dict, **default_params) -> dict:
                     "value": default_params.get("resolution", 23.33),
                     "unit": "um/px",
                 },
-                get_pv("pneumatic"): {"type": "enum", "enums": ["OUT", "IN"]},
+                get_pv("target_control"): {"type": "enum", "enums": ["OUT", "IN"]},
             }
-            # need to change screen class...... pneumatic is an enum not a thingy
-            pvdb.update(screen_params)
 
         elif "TCAV" in key:
-            tcav_params = {
-                get_pv("amp_fbenb"): {"type": "enum", "enums": ["Disable", "Enable"]},
-                get_pv("amp_fbst"): {
+            device_params= {
+                get_pv("amplitude_fbenb"): {"type": "enum", "enums": ["Disable", "Enable"]},
+                get_pv("amplitude_fbst"): {
                     "type": "enum",
                     "enums": ["Disable", "Pause", "Feedforward", "Enable"],
                 },
@@ -101,11 +98,11 @@ def create_pvdb(device: dict, **default_params) -> dict:
                     "enums": ["Disable", "Pause", "Feedforward", "Enable"],
                 },
                 get_pv("rf_enable"): {"type": "enum", "enums": ["Disable", "Enable"]},
-                get_pv("amp_set"): {
+                get_pv("amplitude"): {
                     "value": 0.0,
                     "prec": 5,
                 },
-                get_pv("phase_set"): {
+                get_pv("phase"): {
                     "value": 0.0,
                     "prec": 5,
                 },
@@ -114,15 +111,21 @@ def create_pvdb(device: dict, **default_params) -> dict:
                     "enums": ["Disable", "ACCEL", "STDBY"],
                 },
             }
-            pvdb.update(tcav_params)
+
 
         elif "BPMS" in key:
-            bpms_params = {
+            device_params = {
                 get_pv("tmit"): {"type": "float", "value": 0.0, "prec": 5},
                 get_pv("x"): {"type": "float", "value": 0.0, "prec": 5},
                 get_pv("y"): {"type": "float", "value": 0.0, "prec": 5},
             }
-            pvdb.update(bpms_params)
+
+        #check in the key had missing pv values if so omit it since lcls_elements.csv did not agree with yaml
+        if any('missing' in pkey for pkey in device_params.keys()):
+            continue
+
+        #update pvdb with device pvs
+        pvdb.update(device_params)
 
     return pvdb
 
