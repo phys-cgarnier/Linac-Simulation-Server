@@ -1,20 +1,18 @@
 #!/usr/bin/env bash
 
-set -e
-
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# If the particle distribution has not been extracted, extract it now
-[ ! -f h5/impact_inj_output_YAG03.h5 ] && echo "Extracting YAG03 h5..." && xz -k -d h5/impact_inj_output_YAG03.h5.xz
-
-# Get into the rhel7 env
-if [ -f /afs/slac/g/lcls/package/anaconda/envs/rhel7_devel/bin/activate ]; then
-	source /afs/slac/g/lcls/package/anaconda/envs/rhel7_devel/bin/activate
-fi
-
+#  Activate the conda environment from environment.yml
+conda activate linac-simulation || (echo "Could not activate conda environment 'linac-simulation'. Did you run 'conda env create -f environment.yml'?" && exit 1)
 # Setup epics vars
-source epics-env.sh
+source env_vars.sh
 
-# Start it
+# Check for provided arguments or provide defaults
+NAME="${1:-diag0}"
+OVERVIEW="${2:-False}"
+NOISE="${3:-0.0}"
+
+
+# Start the server
 echo "Starting server..."
-python3 simulated_server.py
+python3 run.py --name $NAME --monitor_overview $OVERVIEW --measurement_noise_level $NOISE
