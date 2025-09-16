@@ -2,25 +2,39 @@
 
 This project provides a simulated EPICS server that hosts PVs using PCASpy. The simulation is designed to work with the Cheetah accelerator framework and includes examples for interfacing with the lcls-tools.
 
+
 ## Setup Instructions
-
 To set up and run the simulated server, follow these steps:
+### TL;DR
+- **Local**: create a conda env, then `./start_server.sh`
+- **SLAC dev-srv09 server**: EPICS + conda are pre-provisioned; just `./start_server.sh`
 
-### Setting up the environment:
+### Setting up the environment and starting the simulation server locally:
 
+#### Clone the Simulation Server
 ```sh
 $ git clone https://github.com/slaclab/Linac-Simulation-Server.git
-$ cd Linac-Simulation-Server/yaml_configs
-$ source /sdf/group/cds/sw/epics/users/ernesto/sandbox/ML_Physics/conda-local-activate.sh
+```
+#### Create the conda environment
+```sh
+$ cd Linac-Simulation-Server
 $ conda env create -f environment.yml
-$ conda activate linac-simulation
-$ source /afs/slac/g/lcls/tools/script/ENVS64.bash
+```
+#### Start the server
+```sh
+$ source start.sh
 ```
 
-### Run the simulated server:
+### Setting up the environment and starting the simulation server on SLACs development servers :
 
+#### Clone the Simulation Server
+```sh
+$ git clone https://github.com/slaclab/Linac-Simulation-Server.git
 ```
-$ ./start.sh
+
+#### Start the server
+```sh
+$ source start.sh
 ```
 
 ### Accessing PVs
