@@ -36,7 +36,7 @@ $ git clone https://github.com/slaclab/Linac-Simulation-Server.git
 ```sh
 $ source start.sh
 ```
-***Note: Dev-srv09 has its own epics configuration files and conda environment that natively supports the server without the User having to do anything special***
+***Note: Dev-srv09 has its own epics configuration files and conda environment that natively support the server without the user having to do anything special***
 
 ### Accessing PVs
 
@@ -47,14 +47,14 @@ Make sure you source this script before attempting to access PVs using caget/pvg
 ```
 $ cd Linac-Simulation-Server/
 $ source setup-epics-conda.sh
-caget YOUR_FAVORITE_SIMULATED_PV
+$ caget YOUR_FAVORITE_SIMULATED_PV
 ```
 It is _not_ necessary to source setup-epics-conda.sh before running `start.sh`, as that setup is handled automatically by `start.sh`. This is simply a way to configure your epics broadcasting to read from the the PVs being served by the Linac Simulation Server.
 
 ### About the setup/start scripts
 The repo comes with two scripts:
-* _setup-epics-conda.sh_ which sets up the epics environment variables and activates the conda environment*
-* _start.sh_ calls _setup-epics-conda.sh_ and starts the server with default arguments *
+* `setup-epics-conda.sh` which sets up the epics environment variables and activates the conda environment.
+* `start.sh` calls `setup-epics-conda.sh` and starts the server with default arguments.
 
 #### Badger
 ```
