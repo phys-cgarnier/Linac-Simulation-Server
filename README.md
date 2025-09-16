@@ -6,8 +6,8 @@ This project provides a simulated EPICS server that hosts PVs using PCASpy. The 
 ## Setup Instructions
 To set up and run the simulated server, follow these steps:
 ### TL;DR
-- **Local**: create a conda env, then `./start_server.sh`
-- **SLAC dev-srv09 server**: EPICS + conda are pre-provisioned; just `./start_server.sh`
+- **Local**: create a conda env, then `./start.sh`
+- **SLAC dev-srv09 server**: EPICS + conda are pre-provisioned; just `./start.sh`
 
 ### Setting up the environment and starting the simulation server locally:
 
@@ -36,22 +36,27 @@ $ git clone https://github.com/slaclab/Linac-Simulation-Server.git
 ```sh
 $ source start.sh
 ```
+***Note: Dev-srv09 has its own epics configuration files and conda environment that natively supports the server without the User having to do anything special***
 
 ### Accessing PVs
 
-On a separate terminal, the epics-env.sh script will setup your environment appropriately to access the PVs exported by the server.
+On a separate terminal, the setup-epics-conda.sh script will setup your environment appropriately to access the PVs served by the server.
 
 Make sure you source this script before attempting to access PVs using caget/pvget, or tools like Badger.
 
 ```
 $ cd Linac-Simulation-Server/
-$ source /afs/slac/g/lcls/tools/script/ENVS64.bash
-$ source epics-env.sh
+$ source setup-epics-conda.sh
+caget YOUR_FAVORITE_SIMULATED_PV
 ```
-It is _not_ necessary to source epics_env.sh before running `start.sh`, as that setup is handled automatically by `start.sh`
+It is _not_ necessary to source setup-epics-conda.sh before running `start.sh`, as that setup is handled automatically by `start.sh`. This is simply a way to configure your epics broadcasting to read from the the PVs being served by the Linac Simulation Server.
+
+### About the setup/start scripts
+The repo comes with two scripts:
+* _setup-epics-conda.sh_ which sets up the epics environment variables and activates the conda environment*
+* _start.sh_ calls _setup-epics-conda.sh_ and starts the server with default arguments *
 
 #### Badger
-
 ```
 $ source /sdf/sw/epics/package/anaconda/envs/rhel7_devel/bin/activate
 $ cd Badger-Resources/cu_hxr
@@ -82,7 +87,7 @@ lcls-tools for interfacing with EPICS
 
 ## Additional Notes
 
-Ensure that all dependencies are installed properly and that the `epics-env.sh` script is sourced before trying to access PVs exported by the server. Otherwise, you may unexpectedly
+Ensure that all dependencies are installed properly and that the `setup-epics-conda.sh` script is sourced before trying to access PVs exported by the server. Otherwise, you may unexpectedly
 access PVs exported by real IOCs on the DEV or PROD networks (depending on your gateway settings).
 
 For any issues, verify that the required environment is activated and that caget and caput can communicate with the hosted PVs.
