@@ -105,7 +105,7 @@
         "ws02": ["Marker", {}],
         "de05a": ["Drift", {"length": 0.07598400115966797, "tracking_method": "cheetah"}],
         "mrk0": ["Marker", {}],
-        "otr2": ["Marker", {"resolution": [1392,1040],"pixel_size": [12.66e-6,12.66e-6],"is_active": true}],
+        "otr2": ["Screen", {"resolution": [1392,1040],"pixel_size": [12.66e-6,12.66e-6],"is_active": true}],
         "de06d": ["Drift", {"length": 0.1638306975364685, "tracking_method": "cheetah"}],
         "bpm10": ["Marker", {}],
         "de06e": ["Drift", {"length": 1.5979303121566772, "tracking_method": "cheetah"}],
