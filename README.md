@@ -65,7 +65,7 @@ You can pass up to four positional arguments:
 
 ```bash
 ./start.sh $1 $2 $3 $4
-
+```
 Missing arguments will fall back to defaults.
 
 | Argument | Description                                          | Options / Type          | Default |
@@ -76,7 +76,7 @@ Missing arguments will fall back to defaults.
 | `$4`     | Noise level to add to simulation.                    | Float                   | `0.0`   |
 
 * Example usage: `start.sh 1 nc_injector`, **note: missing positional arguments resolve to defaults**
-```
+
 ### Badger
 ```
 $ source /sdf/sw/epics/package/anaconda/envs/rhel7_devel/bin/activate
