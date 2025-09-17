@@ -52,11 +52,32 @@ $ caget YOUR_FAVORITE_SIMULATED_PV
 It is _not_ necessary to source setup-epics-conda.sh before running `start.sh`, as that setup is handled automatically by `start.sh`. This is simply a way to configure your epics broadcasting to read from the the PVs being served by the Linac Simulation Server.
 
 ### About the setup/start scripts
-The repo comes with two scripts:
-* `setup-epics-conda.sh` which sets up the epics environment variables and activates the conda environment.
-* `start.sh` calls `setup-epics-conda.sh` and starts the server with default arguments.
+This repo provides two helper scripts:
 
-#### Badger
+- **`setup-epics-conda.sh`** – Sets EPICS environment variables and activates the conda environment.  
+- **`start.sh`** – Sources `setup-epics-conda.sh` and launches the server.  
+  - Supports **default arguments** if none are provided.  
+  - Can also take up to four positional command-line arguments.
+
+#### Command-line arguments for `start.sh`
+
+You can pass up to four positional arguments:
+
+```bash
+./start.sh $1 $2 $3 $4
+
+Missing arguments will fall back to defaults.
+
+| Argument | Description                                          | Options / Type          | Default |
+| -------- | ---------------------------------------------------- | ----------------------- | ------- |
+| `$1`     | LCLS\_LATTICE override. Use the repo lattice if set. | `0` (false), `1` (true) | `0`     |
+| `$2`     | Physics model to simulate.                           | `diag0`, `nc_injector`  | `diag0` |
+| `$3`     | Print an overview plot each time a PV changes.       | `True`, `False`         | `False` |
+| `$4`     | Noise level to add to simulation.                    | Float                   | `0.0`   |
+
+* Example usage: `start.sh 1 nc_injector`, **note: missing positional arguments resolve to defaults**
+```
+### Badger
 ```
 $ source /sdf/sw/epics/package/anaconda/envs/rhel7_devel/bin/activate
 $ cd Badger-Resources/cu_hxr
