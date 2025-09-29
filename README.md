@@ -32,7 +32,7 @@ Make sure you source this script before attempting to access PVs using caget/pvg
 ```
 $ cd Linac-Simulation-Server/
 $ source /afs/slac/g/lcls/tools/script/ENVS64.bash
-$ source epics-env.sh
+$ source env_vars.sh
 ```
 It is _not_ necessary to source epics_env.sh before running `start.sh`, as that setup is handled automatically by `start.sh`
 
