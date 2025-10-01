@@ -70,7 +70,7 @@ Missing arguments will fall back to defaults.
 
 | Argument | Description                                          | Options / Type          | Default |
 | -------- | ---------------------------------------------------- | ----------------------- | ------- |
-| `$1`     | LCLS\_LATTICE override. Use the repo lattice if set. | `0` (false), `1` (true) | `0`     |
+| `$1`     | LCLS\_LATTICE override. Use the repo lattice if set. | `0` (default_path), `/abs/path` | `0` (default_path)     |
 | `$2`     | Physics model to simulate.                           | `diag0`, `nc_injector`  | `diag0` |
 | `$3`     | Print an overview plot each time a PV changes.       | `True`, `False`         | `False` |
 | `$4`     | Noise level to add to simulation.                    | Float                   | `0.0`   |
