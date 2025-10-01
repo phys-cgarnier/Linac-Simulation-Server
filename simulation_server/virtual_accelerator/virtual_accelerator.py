@@ -230,6 +230,11 @@ class VirtualAccelerator:
                         element, attribute_name, energy
                     )
                 except ValueError as e:
+                    # Do we want to crash the server if one PV fails? Or provide robust
+                    # debugging information/ warnings? Not all PVs are supported, and there exists
+                    # many conflicts between lcls_elements, the PVs lcls-tools gets from development,
+                    # the cheetah lattice, and supported cheetah device attributes.
+                    
                     raise ValueError(f"Failed to get PV {pv_name}: {str(e)}") from e
 
             else:
