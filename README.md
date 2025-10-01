@@ -75,7 +75,7 @@ Missing arguments will fall back to defaults.
 | `$3`     | Print an overview plot each time a PV changes.       | `True`, `False`         | `False` |
 | `$4`     | Noise level to add to simulation.                    | Float                   | `0.0`   |
 
-* Example usage: `start.sh 1 nc_injector`, **note: missing positional arguments resolve to defaults**
+* Example usage: `start.sh /abs/lattice/path nc_injector`, **note: missing positional arguments resolve to defaults**
 
 ### Badger
 ```
