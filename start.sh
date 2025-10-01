@@ -5,11 +5,14 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 source setup-epics-conda.sh
 LATTICE_FLAG="${1:-0}"
-if [ "$LATTICE_FLAG" -eq 1 ]; then
-    echo Overriding LCLS_LATTICE to use local copy
-    export LCLS_LATTICE=$(pwd)/simulation_server/lattices
-# Check for provided arguments or provide defaults
+if [ "$LATTICE_FLAG" = "0" ]; then
+    export LCLS_LATTICE=/sdf/group/ad/sw/scm/repos/optics/lcls-lattice/cheetah
+else
+    echo Overriding LCLS_LATTICE to use local copy provided: $1
+    export LCLS_LATTICE=$1
 fi
+
+ 
 NAME="${2:-diag0}"
 OVERVIEW="${3:-False}"
 NOISE="${4:-0.0}"
