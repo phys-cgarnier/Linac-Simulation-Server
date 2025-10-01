@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
-
 cd "$(dirname "${BASH_SOURCE[0]}")"
+#  Activate conda environment and set EPICS env variables
 
-#  Activate the conda environment from environment.yml
-conda activate linac-simulation || (echo "Could not activate conda environment 'linac-simulation'. Did you run 'conda env create -f environment.yml'?" && exit 1)
-# Setup epics vars
-source env_vars.sh
 
-# Check for provided arguments or provide defaults
-NAME="${1:-diag0}"
-OVERVIEW="${2:-False}"
-NOISE="${3:-0.0}"
+source setup-epics-conda.sh
+LATTICE_FLAG="${1:-0}"
+if [ "$LATTICE_FLAG" = "0" ]; then
+    export LCLS_LATTICE=/sdf/group/ad/sw/scm/repos/optics/lcls-lattice/cheetah
+else
+    echo Overriding LCLS_LATTICE to use local copy provided: $1
+    export LCLS_LATTICE=$1
+fi
 
+ 
+NAME="${2:-diag0}"
+OVERVIEW="${3:-False}"
+NOISE="${4:-0.0}"
 
 # Start the server
 echo "Starting server..."

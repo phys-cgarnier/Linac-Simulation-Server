@@ -9,7 +9,7 @@ from simulation_server.factory import get_virtual_accelerator
 import lcls_tools.common.devices.yaml as yaml_directory
 import pprint
 FILEPATH= pathlib.Path(yaml_directory.__file__).parent.resolve()
-FP= pathlib.Path(__file__).parent.resolve()
+#FP= pathlib.Path(__file__).parent.resolve()
 def run_simulation_server(name, monitor_overview, measurement_noise_level):
     if name == "diag0":
         devices = load_relevant_controls(
@@ -18,7 +18,8 @@ def run_simulation_server(name, monitor_overview, measurement_noise_level):
 
     elif name == "nc_injector":
         devices = load_relevant_controls(
-            os.path.join(FP,"simulation_server","yaml_configs", "DL1_2_OTR2.yaml")
+            os.path.join( FILEPATH, "DL1.yaml")
+            #os.path.join(FP,"simulation_server","yaml_configs", "DL1.yaml")
         )
     else:
         raise ValueError(f"Unknown virtual accelerator name: {name}")

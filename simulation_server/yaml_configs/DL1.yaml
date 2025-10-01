@@ -759,12 +759,86 @@ magnets:
       l_eff: 0.0
       sum_l_meters: 19.382
       type: YCOR
+pmts:
+  PMT2111:
+    controls_information:
+      PVs: {}
+      control_name: PMT:LI21:285
+    metadata:
+      area: DL1
+      beam_path: []
+      sum_l_meters: null
+      type: INST
+  PMTINJ01:
+    controls_information:
+      PVs:
+        qdcraw: PMT:IN20:621:QDCRAW
+      control_name: PMT:IN20:621
+    metadata:
+      area: DL1
+      beam_path: []
+      sum_l_meters: null
+      type: INST
+  PMTINJ02:
+    controls_information:
+      PVs:
+        qdcraw: PMT:IN20:622:QDCRAW
+      control_name: PMT:IN20:622
+    metadata:
+      area: DL1
+      beam_path: []
+      sum_l_meters: null
+      type: INST
+  PMTINJ03:
+    controls_information:
+      PVs:
+        qdcraw: PMT:IN20:511:QDCRAW
+      control_name: PMT:IN20:511
+    metadata:
+      area: DL1
+      beam_path: []
+      sum_l_meters: null
+      type: INST
+  PMTINJ04:
+    controls_information:
+      PVs:
+        qdcraw: PMT:IN20:512:QDCRAW
+      control_name: PMT:IN20:512
+    metadata:
+      area: DL1
+      beam_path: []
+      sum_l_meters: null
+      type: INST
+  PMTINJ05:
+    controls_information:
+      PVs:
+        qdcraw: PMT:IN20:761:QDCRAW
+      control_name: PMT:IN20:761
+    metadata:
+      area: DL1
+      beam_path: []
+      sum_l_meters: null
+      type: INST
+  PMTINJ06:
+    controls_information:
+      PVs:
+        qdcraw: PMT:IN20:762:QDCRAW
+      control_name: PMT:IN20:762
+    metadata:
+      area: DL1
+      beam_path: []
+      sum_l_meters: null
+      type: INST
 screens:
   OTR1:
     controls_information:
       PVs:
-        pneumatic: OTRS:IN20:541:PNEUMATIC
+        filter_1_status: OTRS:IN20:541:FLT1_STS
+        filter_2_status: OTRS:IN20:541:FLT2_STS
+        target_control: OTRS:IN20:541:PNEUMATIC
+        target_status: OTRS:IN20:541:TGT_STS
       control_name: OTRS:IN20:541
+      pv_cache: {}
     metadata:
       area: DL1
       beam_path:
@@ -775,21 +849,33 @@ screens:
       - CU_SFTH
       - CU_SPEC
       - CU_SXR
+      hardware: {}
       sum_l_meters: 12.327
       type: PROF
   OTR2:
     controls_information:
       PVs:
+        filter_1_control: OTRS:IN20:571:FLT1_CTRL
+        filter_1_status: OTRS:IN20:571:FLT1_STS
+        filter_2_control: OTRS:IN20:571:FLT2_CTRL
+        filter_2_status: OTRS:IN20:571:FLT2_STS
         image: OTRS:IN20:571:Image:ArrayData
+        lamp_power: OTRS:IN20:571:TGT_LAMP_PWR
         n_bits: OTRS:IN20:571:N_OF_BITS
         n_col: OTRS:IN20:571:Image:ArraySize1_RBV
         n_row: OTRS:IN20:571:Image:ArraySize0_RBV
-        pneumatic: OTRS:IN20:571:PNEUMATIC
+        orient_x: OTRS:IN20:571:X_ORIENT
+        orient_y: OTRS:IN20:571:Y_ORIENT
         ref_rate: OTRS:IN20:571:ArrayRate_RBV
         ref_rate_vme: OTRS:IN20:571:FRAME_RATE
         resolution: OTRS:IN20:571:RESOLUTION
         sys_type: OTRS:IN20:571:SYS_TYPE
+        target_control: OTRS:IN20:571:PNEUMATIC
+        target_status: OTRS:IN20:571:TGT_STS
       control_name: OTRS:IN20:571
+      pv_cache:
+        orient_x: Negative
+        orient_y: Negative
     metadata:
       area: DL1
       beam_path:
@@ -800,20 +886,36 @@ screens:
       - CU_SFTH
       - CU_SPEC
       - CU_SXR
+      hardware:
+        CAM: 1.0
+        FLT1: 1.0
+        FLT2: 1.0
+        GLAMP: 1.0
+        MTR: 0.0
+        TGT: 1.0
+        TLAMP: 1.0
       sum_l_meters: 14.241
       type: PROF
   OTR3:
     controls_information:
       PVs:
+        filter_1_status: OTRS:IN20:621:FLT1_STS
+        filter_2_status: OTRS:IN20:621:FLT2_STS
         image: OTRS:IN20:621:IMAGE
         n_bits: OTRS:IN20:621:N_OF_BITS
         n_col: OTRS:IN20:621:N_OF_COL
         n_row: OTRS:IN20:621:N_OF_ROW
-        pneumatic: OTRS:IN20:621:PNEUMATIC
+        orient_x: OTRS:IN20:621:X_ORIENT
+        orient_y: OTRS:IN20:621:Y_ORIENT
         ref_rate_vme: OTRS:IN20:621:FRAME_RATE
         resolution: OTRS:IN20:621:RESOLUTION
         sys_type: OTRS:IN20:621:SYS_TYPE
+        target_control: OTRS:IN20:621:PNEUMATIC
+        target_status: OTRS:IN20:621:TGT_STS
       control_name: OTRS:IN20:621
+      pv_cache:
+        orient_x: Negative
+        orient_y: Negative
     metadata:
       area: DL1
       beam_path:
@@ -824,20 +926,29 @@ screens:
       - CU_SFTH
       - CU_SPEC
       - CU_SXR
+      hardware: {}
       sum_l_meters: 16.155
       type: PROF
   OTR4:
     controls_information:
       PVs:
+        filter_1_status: OTRS:IN20:711:FLT1_STS
+        filter_2_status: OTRS:IN20:711:FLT2_STS
         image: OTRS:IN20:711:IMAGE
         n_bits: OTRS:IN20:711:N_OF_BITS
         n_col: OTRS:IN20:711:N_OF_COL
         n_row: OTRS:IN20:711:N_OF_ROW
-        pneumatic: OTRS:IN20:711:PNEUMATIC
+        orient_x: OTRS:IN20:711:X_ORIENT
+        orient_y: OTRS:IN20:711:Y_ORIENT
         ref_rate_vme: OTRS:IN20:711:FRAME_RATE
         resolution: OTRS:IN20:711:RESOLUTION
         sys_type: OTRS:IN20:711:SYS_TYPE
+        target_control: OTRS:IN20:711:PNEUMATIC
+        target_status: OTRS:IN20:711:TGT_STS
       control_name: OTRS:IN20:711
+      pv_cache:
+        orient_x: Negative
+        orient_y: Negative
     metadata:
       area: DL1
       beam_path:
@@ -847,21 +958,33 @@ screens:
       - CU_HXTES
       - CU_SFTH
       - CU_SXR
+      hardware: {}
       sum_l_meters: 17.797
       type: PROF
   OTRH1:
     controls_information:
       PVs:
+        filter_1_control: OTRS:IN20:465:FLT1_CTRL
+        filter_1_status: OTRS:IN20:465:FLT1_STS
+        filter_2_control: OTRS:IN20:465:FLT2_CTRL
+        filter_2_status: OTRS:IN20:465:FLT2_STS
         image: OTRS:IN20:465:Image:ArrayData
+        lamp_power: OTRS:IN20:465:TGT_LAMP_PWR
         n_bits: OTRS:IN20:465:N_OF_BITS
         n_col: OTRS:IN20:465:Image:ArraySize1_RBV
         n_row: OTRS:IN20:465:Image:ArraySize0_RBV
-        pneumatic: OTRS:IN20:465:PNEUMATIC
+        orient_x: OTRS:IN20:465:X_ORIENT
+        orient_y: OTRS:IN20:465:Y_ORIENT
         ref_rate: OTRS:IN20:465:ArrayRate_RBV
         ref_rate_vme: OTRS:IN20:465:FRAME_RATE
         resolution: OTRS:IN20:465:RESOLUTION
         sys_type: OTRS:IN20:465:SYS_TYPE
+        target_control: OTRS:IN20:465:PNEUMATIC
+        target_status: OTRS:IN20:465:TGT_STS
       control_name: OTRS:IN20:465
+      pv_cache:
+        orient_x: Negative
+        orient_y: Negative
     metadata:
       area: DL1
       beam_path:
@@ -872,21 +995,40 @@ screens:
       - CU_SFTH
       - CU_SPEC
       - CU_SXR
+      hardware:
+        CAM: 1.0
+        FLT1: 0.0
+        FLT2: 0.0
+        GLAMP: 1.0
+        MTR: 0.0
+        TGT: 1.0
+        TLAMP: 1.0
       sum_l_meters: 9.528
       type: PROF
   OTRH2:
     controls_information:
       PVs:
+        filter_1_control: OTRS:IN20:471:FLT1_CTRL
+        filter_1_status: OTRS:IN20:471:FLT1_STS
+        filter_2_control: OTRS:IN20:471:FLT2_CTRL
+        filter_2_status: OTRS:IN20:471:FLT2_STS
         image: OTRS:IN20:471:Image:ArrayData
+        lamp_power: OTRS:IN20:471:TGT_LAMP_PWR
         n_bits: OTRS:IN20:471:N_OF_BITS
         n_col: OTRS:IN20:471:Image:ArraySize1_RBV
         n_row: OTRS:IN20:471:Image:ArraySize0_RBV
-        pneumatic: OTRS:IN20:471:PNEUMATIC
+        orient_x: OTRS:IN20:471:X_ORIENT
+        orient_y: OTRS:IN20:471:Y_ORIENT
         ref_rate: OTRS:IN20:471:ArrayRate_RBV
         ref_rate_vme: OTRS:IN20:471:FRAME_RATE
         resolution: OTRS:IN20:471:RESOLUTION
         sys_type: OTRS:IN20:471:SYS_TYPE
+        target_control: OTRS:IN20:471:PNEUMATIC
+        target_status: OTRS:IN20:471:TGT_STS
       control_name: OTRS:IN20:471
+      pv_cache:
+        orient_x: Negative
+        orient_y: Negative
     metadata:
       area: DL1
       beam_path:
@@ -897,17 +1039,46 @@ screens:
       - CU_SFTH
       - CU_SPEC
       - CU_SXR
+      hardware:
+        CAM: 1.0
+        FLT1: 0.0
+        FLT2: 0.0
+        GLAMP: 1.0
+        MTR: 0.0
+        TGT: 1.0
+        TLAMP: 1.0
       sum_l_meters: 10.211
       type: PROF
   YAG04:
     controls_information:
       PVs: {}
       control_name: YAGS:IN20:465
+      pv_cache: {}
     metadata:
       area: DL1
       beam_path: []
+      hardware: {}
       sum_l_meters: null
       type: PROF
+tcavs:
+  TCAV0:
+    controls_information:
+      PVs: {}
+      control_name: TCAV:IN20:490
+    metadata:
+      area: DL1
+      beam_path:
+      - CU_ALINE
+      - CU_HTXI
+      - CU_HXR
+      - CU_HXTES
+      - CU_SFTH
+      - CU_SPEC
+      - CU_SXR
+      l_eff: 0.668
+      rf_freq: 2856.0
+      sum_l_meters: 11.147
+      type: LCAV
 wires:
   WS01:
     controls_information:
@@ -916,7 +1087,7 @@ wires:
         enabled: WIRE:IN20:531:MOTR_ENABLED_STS
         initialize_status: WIRE:IN20:531:MOTR_INIT_STS
         motor: WIRE:IN20:531:MOTR
-        position: WIRE:IN20:531:MOTR.RBV
+        motor_rbv: WIRE:IN20:531:MOTR.RBV
         scan_pulses: WIRE:IN20:531:SCANPULSES
         speed: WIRE:IN20:531:MOTR.VELO
         speed_max: WIRE:IN20:531:MOTR.VMAX
@@ -945,6 +1116,10 @@ wires:
       - CU_SFTH
       - CU_SPEC
       - CU_SXR
+      lblms:
+      - PMTINJ03:DL1
+      - PMTINJ05:DL1
+      - PMT21350:LI21
       sum_l_meters: 12.175
       type: WIRE
   WS02:
@@ -956,7 +1131,7 @@ wires:
         initialize: WIRE:IN20:561:MOTR_INIT
         initialize_status: WIRE:IN20:561:MOTR_INIT_STS
         motor: WIRE:IN20:561:MOTR
-        position: WIRE:IN20:561:MOTR.RBV
+        motor_rbv: WIRE:IN20:561:MOTR.RBV
         retract: WIRE:IN20:561:MOTR_RETRACT
         scan_pulses: WIRE:IN20:561:SCANPULSES
         speed: WIRE:IN20:561:MOTR.VELO
@@ -988,6 +1163,10 @@ wires:
       - CU_SFTH
       - CU_SPEC
       - CU_SXR
+      lblms:
+      - PMTINJ03:DL1
+      - PMTINJ05:DL1
+      - PMT21350:LI21
       sum_l_meters: 14.089
       type: WIRE
   WS03:
@@ -999,7 +1178,7 @@ wires:
         initialize: WIRE:IN20:611:MOTR_INIT
         initialize_status: WIRE:IN20:611:MOTR_INIT_STS
         motor: WIRE:IN20:611:MOTR
-        position: WIRE:IN20:611:MOTR.RBV
+        motor_rbv: WIRE:IN20:611:MOTR.RBV
         retract: WIRE:IN20:611:MOTR_RETRACT
         scan_pulses: WIRE:IN20:611:SCANPULSES
         speed: WIRE:IN20:611:MOTR.VELO
@@ -1031,6 +1210,10 @@ wires:
       - CU_SFTH
       - CU_SPEC
       - CU_SXR
+      lblms:
+      - PMTINJ03:DL1
+      - PMTINJ05:DL1
+      - PMT21350:LI21
       sum_l_meters: 16.003
       type: WIRE
   WS04:
@@ -1040,7 +1223,7 @@ wires:
         enabled: WIRE:IN20:741:MOTR_ENABLED_STS
         initialize_status: WIRE:IN20:741:MOTR_INIT_STS
         motor: WIRE:IN20:741:MOTR
-        position: WIRE:IN20:741:MOTR.RBV
+        motor_rbv: WIRE:IN20:741:MOTR.RBV
         scan_pulses: WIRE:IN20:741:SCANPULSES
         speed: WIRE:IN20:741:MOTR.VELO
         speed_max: WIRE:IN20:741:MOTR.VMAX
@@ -1068,5 +1251,9 @@ wires:
       - CU_HXTES
       - CU_SFTH
       - CU_SXR
+      lblms:
+      - PMTINJ03:DL1
+      - PMTINJ05:DL1
+      - PMT21350:LI21
       sum_l_meters: 18.519
       type: WIRE
