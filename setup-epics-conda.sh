@@ -25,5 +25,3 @@ export EPICS_PVA_SERVER_PORT=10415
 export EPICS_PVA_ADDR_LIST=127.0.0.1
 export EPICS_PVA_AUTO_ADDR_LIST=YES
 
-#Setup lattice environment variables
-export LCLS_LATTICE=/sdf/group/ad/sw/scm/repos/optics/lcls-lattice/cheetah
