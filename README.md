@@ -6,8 +6,8 @@ This project provides a simulated EPICS server that hosts PVs using PCASpy. The 
 ## Setup Instructions
 To set up and run the simulated server, follow these steps:
 ### TL;DR
-- **Local**: create a conda env, then `./start.sh`
-- **SLAC dev-srv09 server**: EPICS + conda are pre-provisioned; just `./start.sh`
+- **Local**: create a conda env, then `source start.sh`
+- **SLAC dev-srv09 server**: EPICS + conda are pre-provisioned; just `source start.sh`
 
 ### Setting up the environment and starting the simulation server locally:
 
@@ -49,7 +49,7 @@ $ cd Linac-Simulation-Server/
 $ source setup-epics-conda.sh
 $ caget YOUR_FAVORITE_SIMULATED_PV
 ```
-It is _not_ necessary to source setup-epics-conda.sh before running `start.sh`, as that setup is handled automatically by `start.sh`. This is simply a way to configure your epics broadcasting to read from the the PVs being served by the Linac Simulation Server.
+It is _not_ necessary to source setup-epics-conda.sh before running `source start.sh`, as that setup is handled automatically by `start.sh`. This is simply a way to configure your epics broadcasting to read from the the PVs being served by the Linac Simulation Server.
 
 ### About the setup/start scripts
 This repo provides two helper scripts:
@@ -64,7 +64,7 @@ This repo provides two helper scripts:
 You can pass up to four positional arguments:
 
 ```bash
-./start.sh $1 $2 $3 $4
+source start.sh $1 $2 $3 $4
 ```
 Missing arguments will fall back to defaults.
 
@@ -75,7 +75,7 @@ Missing arguments will fall back to defaults.
 | `$3`     | Print an overview plot each time a PV changes.       | `True`, `False`         | `False` |
 | `$4`     | Noise level to add to simulation.                    | Float                   | `0.0`   |
 
-* Example usage: `start.sh /abs/lattice/path nc_injector`, **note: missing positional arguments resolve to defaults**
+* Example usage: `source start.sh /abs/lattice/path nc_injector`, **note: missing positional arguments resolve to defaults**
 
 ### Badger
 ```
