@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-# Optionally, you can make the server use specific ca and pva server ports by specifying the following two env variables:
-#   LINAC_SIM_SERVER_CA_PORT -> sets EPICS_CA_SERVER_PORT (default: 10512)
-#   LINAC_SIM_SERVER_PVA_PORT -> sets EPICS_PVA_SERVER_PORT (default: 10415)
-# (Note: setting EPICS_[CA|PVA]_SERVER_PORT directly in your own shell will not z
-# -----------------------------------------------------------------------------
+# Optionally, you can make the server use specific ca and pva server ports by setting the following two env variables:
+# LINAC_SIM_SERVER_CA_PORT (default: 10512)
+# LINAC_SIM_SERVER_PVA_PORT (default: 10415)
 
 LINAC_SIM_SERVER_CA_PORT=${LINAC_SIM_SERVER_CA_PORT:-10512} # `:-` is bash syntax, not negative num
 LINAC_SIM_SERVER_PVA_PORT=${LINAC_SIM_SERVER_PVA_PORT:-10415}
