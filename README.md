@@ -63,17 +63,14 @@ To confirm the PVs you are accessing are in fact being served by the simulated s
   Element count:    1
 ```
 
-It should be noted that if using a shared machine (like dev-srv09), running the server will fail if another user has it already running using the same ports. The error will look something like this:
+When trying to run the server on a shared machine (like dev-srv09), another user may already be running the server on the same ports.
+In this case the server will use random ports instead, and you must set both `EPICS_CA_SERVER_PORT` and `EPICS_PVA_SERVER_PORT` again accordingly.
+The server should print the new ports into the terminal.
 
-``
-  warning: Configured TCP port was unavailable.
-  cas warning: Using dynamically assigned TCP port 44463,
-  cas warning: but now two or more servers share the same UDP port.
-  cas warning: Depending on your IP kernel this server may not be
-  cas warning: reachable with UDP unicast (a host's IP in EPICS_CA_ADDR_LIST)
+You can also specify specific ports for the server to use, by passing cmdline args to the `setup-epics-conda.sh` script:
 ```
-
-To avoid this issue: change the values of `EPICS_CA_SERVER_PORT` and `EPICS_PVA_SERVER_PORT` in `setup-epics-conda.sh` to ports not in use, or consider running the server in a docker container.
+source setup-epics-conda.sh <EPICS_CA_SERVER_PORT value> <EPICS_PVA_SERVER_PORT value>
+```
 
 ### About the setup/start scripts
 This repo provides two helper scripts:
