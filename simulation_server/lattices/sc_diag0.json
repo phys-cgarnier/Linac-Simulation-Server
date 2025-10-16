@@ -187,7 +187,7 @@
         "ddg006b": ["Drift", {"length": 0.12714000046253204, "tracking_method": "cheetah"}],
         "bpmdg0rf": ["BPM", {"is_active": true}],
         "ddg006c": ["Drift", {"length": 0.17285999655723572, "tracking_method": "cheetah"}],
-        "tcxdg0": ["TransverseDeflectingCavity", {"length": 0.2540000081062317, "voltage": 350000.0, "phase": 0.0, "frequency": 2856000000.0, "misalignment": [0.0, 0.0], "tilt": 0.0, "num_steps": 1, "tracking_method": "bmadx"}],
+        "tcxdg0": ["TransverseDeflectingCavity", {"length": 0.2540000081062317, "voltage": 175000.0, "phase": 0.0, "frequency": 2856000000.0, "misalignment": [0.0, 0.0], "tilt": 0.0, "num_steps": 1, "tracking_method": "bmadx"}],
         "ycdgtcx": ["VerticalCorrector", {"length": 0.0, "angle": 0.0}],
         "xcdgtcx": ["HorizontalCorrector", {"length": 0.0, "angle": 0.0}],
         "ddg006d": ["Drift", {"length": 0.4869999885559082, "tracking_method": "cheetah"}],
