@@ -49,7 +49,36 @@ $ cd Linac-Simulation-Server/
 $ source setup-epics-conda.sh
 $ caget YOUR_FAVORITE_SIMULATED_PV
 ```
-It is _not_ necessary to source setup-epics-conda.sh before running `start.sh`, as that setup is handled automatically by `start.sh`. This is simply a way to configure your epics broadcasting to read from the the PVs being served by the Linac Simulation Server.
+
+It is _not_ necessary to source setup-epics-conda.sh before running `./start.sh`, as that setup is handled automatically by `start.sh`. This is simply a way to configure your epics broadcasting to read from the the PVs being served by the Linac Simulation Server.
+
+To confirm the PVs you are accessing are in fact being served by the simulated server, calling `cainfo` on a PV should return a host value of `localhost:<EPICS_CA_SERVER_PORT value set by setup-epics-conda.sh>`. The output should look something like this:
+
+```
+  State:            connected
+  Host:             localhost:10512
+  Access:           read, write
+  Native data type: DBF_DOUBLE
+  Request type:     DBR_DOUBLE
+  Element count:    1
+```
+
+When trying to run the server on a shared machine (like dev-srv09), another user may already be running the server on the same ports.
+In this case the server will use random ports instead, and you must set both `EPICS_CA_SERVER_PORT` and `EPICS_PVA_SERVER_PORT` again accordingly in any clients.
+The server should print the new ports into the terminal.
+
+You can also specify specific ports for the server to try and use (it will fallback to finding random ports if those specified are already taken), by setting the env-vars `LINAC_SIM_SERVER_CA_PORT` and `LINAC_SIM_SERVER_PVA_PORT` before running `setup-epics-conda.sh` or `run.sh`:
+```
+export LINAC_SIM_SERVER_CA_PORT=5555
+export LINAC_SIM_SERVER_PVA_PORT=6666
+
+# if client
+source setup-epics-conda.sh
+caget <pv>
+
+# if server
+./start.sh
+```
 
 ### About the setup/start scripts
 This repo provides two helper scripts:
@@ -75,11 +104,12 @@ Missing arguments will fall back to defaults.
 | `$3`     | Print an overview plot each time a PV changes.       | `True`, `False`         | `False` |
 | `$4`     | Noise level to add to simulation.                    | Float                   | `0.0`   |
 
-* Example usage: `start.sh /abs/lattice/path nc_injector`, **note: missing positional arguments resolve to defaults**
+* Example usage: `./start.sh /abs/lattice/path nc_injector`, **note: missing positional arguments resolve to defaults**
 
 ### Badger
 ```
 $ source /sdf/sw/epics/package/anaconda/envs/rhel7_devel/bin/activate
+$ source setup-epics-conda.sh
 $ cd Badger-Resources/cu_hxr
 $ badger -g -cf config.yaml
 ```
