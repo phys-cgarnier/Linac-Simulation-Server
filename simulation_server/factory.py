@@ -7,7 +7,7 @@ from cheetah.particles import ParticleBeam
 from simulation_server.virtual_accelerator import VirtualAccelerator
 
 FILEPATH = pathlib.Path(__file__).parent.resolve()
-LCLS_LATTICE = pathlib.Path(os.environ["LCLS_LATTICE"])
+LCLS_LATTICE = pathlib.Path(os.environ.get("LCLS_LATTICE", "/sdf/group/ad/sw/scm/repos/optics/lcls-lattice/cheetah"))
 
 
 def get_virtual_accelerator(name, monitor_overview=False, measurement_noise_level=None):
