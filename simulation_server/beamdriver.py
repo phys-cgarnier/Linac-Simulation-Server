@@ -7,13 +7,14 @@ from p4p.nt import NTScalar, NTNDArray, NTEnum
 import p4p
 from typing import Dict, Callable, Any
 from simulation_server.virtual_accelerator import VirtualAccelerator
-
+import threading
 
 class SimServer(SimpleServer):
     """
     Subclass of pcaspy.SimpleServer that also serves PVs via PVA
     """
 
+    # Mapping record field names to NT structure field names
     PV_ASSOC = {
         "HOPR": "display.limitHigh",
         "LOPR": "display.limitLow",
@@ -23,6 +24,7 @@ class SimServer(SimpleServer):
         "EGU": "display.units",
     }
 
+    # Mapping pcas PV attributes to record field names
     DB_TO_PV = {
         "unit": "EGU",
         "value": "VAL",
@@ -48,14 +50,14 @@ class SimServer(SimpleServer):
             self._subfield = subfield
 
         def put(self, pv, op):
-            pv.post(op.value())
+            pv.post(op.value(), timestamp=time.time())
             op.done()
 
             # Update the parent PV's subfield too
             if self._parent:
                 val = self._parent._wrap(self._parent.current())
                 val[self._subfield] = op.value()
-                self._parent.post(val)
+                self._parent.post(val, timestamp=time.time())
 
             if self.server._callback:
                 self.server._callback(op.name(), op.value())
@@ -73,21 +75,28 @@ class SimServer(SimpleServer):
         self._callback = None
         self._db = pvdb
 
-        # Create CA PVs
-        self.createPV(prefix, pvdb)
+        # Add a PV to indicate both simulation status and to trigger simulation
+        self.sim_pv_name = "VIRT:BEAM:SIMULATE"
+        self._db[self.sim_pv_name] = {
+            "value": 0
+        }
 
-        ""
+        # Create CA PVs
+        self.createPV(prefix, self._db)
+
         # Create PVA PVs
-        for k, v in pvdb.items():
+        for k, v in self._db.items():
             if k.rfind(".") != -1:
                 continue
             self._pva.update(self._build_pv(f"{prefix}{k}", v))
+
+        self.sim_pv = self._pva[self.sim_pv_name]
 
         super().__init__()
 
     def set_update_callback(self, callable: Callable[[str, Any], None]):
         """
-        Sets the callback to be called every 0.1s in the processing loop (corresponds to fastest EPICS processing time)
+        Sets the PV update callback. This will be invoked when any PV is written to using PVA
 
         Parameters
         ----------
@@ -193,7 +202,7 @@ class SimServer(SimpleServer):
             case _:
                 raise Exception(f'Unhandled type "{desc["type"]}"')
 
-        # Special control fields
+        # Special control fields and status fields
         controls = ["enums", "type", "value", "count", "n_col", "n_row"]
 
         # Add value field
@@ -234,7 +243,7 @@ class SimServer(SimpleServer):
 
         # Post the "real" value to the value PV, including all fields
         if cur:
-            val_pv.post(cur)
+            val_pv.post(cur, timestamp=time.time())
 
         return r
 
@@ -249,7 +258,7 @@ class SimServer(SimpleServer):
         value : Any
             Value to set
         """
-        self._pva[name].post(value)
+        self._pva[name].post(value, timestamp=time.time())
 
 
 class SimDriver(Driver):
@@ -261,16 +270,55 @@ class SimDriver(Driver):
 
         self.server = server
 
+        self.server.set_update_callback(self.write)
+
+        # PV data cache and associated primitives
+        self.pv_cache = {}
+        self.pv_guard = threading.Lock()
+        self.write_guard = threading.Lock()
+        self.thread_cond = threading.Condition(self.write_guard)
+        self.thread = threading.Thread(target=self._model_update_thread)
+        self.new_data = {}
 
         # get list of pvs that should be updated every time we write to a PV
         self.measurement_pvs = self.get_measurement_pvs()
 
-        # initialize ALL pvs with values
+        # init PV cache with all variables (including informational ones)
         key_list = list(self.server.pva_pvs.keys())
-        key_list = [
-            k for k in key_list if not "." in k
-        ]  # filter out keys with attributes
-        self.update_pvs(key_list)
+        for k in key_list:
+            self.pv_cache[k] = self.server.pva_pvs[k].current()
+
+        # Run an initial update of simulated variables
+        self.update_cache(self.measurement_pvs, True)
+
+        self.thread.start()
+
+    def _model_update_thread(self):
+        while True:
+            # Unlocked by thread_cond.wait()
+            self.write_guard.acquire()
+
+            # Wait for a trigger
+            self.thread_cond.wait()
+
+            start = time.time()
+
+            # run simulation
+            print(self.new_data)
+            self.virtual_accelerator.set_pvs(self.new_data)
+
+            # update PV cache with new values
+            self.update_cache(self.measurement_pvs, True)
+
+            self.new_data = {}
+
+            print(f"Simulation took {time.time() - start:.3f} seconds")
+
+            # Indicate that we're done simulating
+            self.set_cached_value(self.server.sim_pv_name, 0, True)
+
+            self.write_guard.release()
+
 
     def get_measurement_pvs(self):
         """Get a list of PVs that should be updated every time we write to a PV"""
@@ -292,6 +340,7 @@ class SimDriver(Driver):
             "BST",
             "MODE",
             "ENABLE",
+            "SIMULATE",
             "REQ",
             "CTRL",
             "TMIT",
@@ -300,37 +349,96 @@ class SimDriver(Driver):
         
         return key_list
 
-    def update_pvs(self, pv_list):
-        print("Updating PVs...")
+    def update_cache(self, pv_list: list, post_monitors: bool):
+        """
+        Updates the PV cache for the list of PVs, optionally updating monitors along the way.
+        Locks the PV cache for you.
+
+        Parameters
+        ----------
+        pv_list : list[str]
+            List of PVs to update
+        post_monitors : bool
+            If true, update PV monitors
+        """
+        self.pv_guard.acquire()
         for name in pv_list:
-            self.read(name)
-        print("PVs updated.")
+            value = self.virtual_accelerator.get_pvs([name])[name]
+            self.pv_cache[name] = value
+            if post_monitors:
+                self.server.set_pv(name, value)
+                self.setParam(name, value)
+        if post_monitors:
+            self.updatePVs()
+        self.pv_guard.release()
+
+    def set_cached_value(self, pv: str, value: Any, post_monitors: bool):
+        """
+        Sets a value in the PV cache, optionally updating monitors/PVs.
+        Locks the PV cache for you.
+        """
+        self.pv_guard.acquire()
+        self.pv_cache[pv] = value
+
+        if post_monitors:
+            self.server.set_pv(pv, value)
+            self.setParam(pv, value)
+            self.updatePV(pv)
+
+        self.pv_guard.release()
+
+    def cached_value(self, reason: str) -> Any|None:
+        """
+        Fetches the latest value of the PV from the cache
+
+        Parameters
+        ----------
+        reason : str
+            Name of the PV
+
+        Returns
+        -------
+        Any|None
+            Value fetched from cache, or None if it doesn't exist
+        """
+        with self.pv_guard:
+            try:
+                value = self.pv_cache[reason]
+            except KeyError:
+                print(f'{reason} had no entry in the cache: {self.pv_cache}')
+                return None
+        return value
 
     def read(self, reason):
-        value = self.virtual_accelerator.get_pvs([reason])[reason]
-        self.server.set_pv(reason, value)
+        # grab latest value from the cache
+        value = self.cached_value(reason)
+
         try:
             self.setParam(reason, value)
         except Exception as e:
             print(f"Error setting param for {reason}: {e}")
 
-        self.updatePVs()
+        self.updatePV(reason)
         return value
 
     def write(self, reason, value):
         """write to a PV, run the simulation, and then update all other PVs"""
         print(f"Writing {value} to {reason}")
-        start = time.time()
 
-        # update the control PV fast
-        self.server.set_pv(reason, value)
-        self.setParam(reason, value)
-        self.updatePV(reason)
+        # Re-run the entire simulation if requested
+        if reason == self.server.sim_pv_name:
+            with self.write_guard:
+                self.set_cached_value(reason, value, True)
+                self.thread_cond.notify_all()
+            return
 
-        # run simulation
-        self.virtual_accelerator.set_pvs({reason: value})
+        # Write an updated cache value. this may be updated later after model evaluation.
+        with self.pv_guard:
+            self.pv_cache[value] = reason
 
-        # update pvs
-        self.update_pvs(self.measurement_pvs)
+        with self.write_guard:
+            # update the control PV fast
+            self.set_cached_value(reason, value, True)
 
-        print(f"Write took {time.time() - start:.3f} seconds")
+            # this is sent to the updater thread
+            self.new_data[reason] = value
