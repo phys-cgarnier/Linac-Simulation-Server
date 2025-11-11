@@ -254,14 +254,13 @@ class SimServer(SimpleServer):
 
 class SimDriver(Driver):
     def __init__(
-        self, server: SimServer, devices: dict, virtual_accelerator: VirtualAccelerator
+        self, server: SimServer, virtual_accelerator: VirtualAccelerator
     ):
         super().__init__()
         self.virtual_accelerator = virtual_accelerator
 
         self.server = server
-        self.devices = devices
-        # pprint.pprint(devices)
+
 
         # get list of pvs that should be updated every time we write to a PV
         self.measurement_pvs = self.get_measurement_pvs()
@@ -298,7 +297,7 @@ class SimDriver(Driver):
             "TMIT",
         ]
         key_list = [k for k in key_list if not any(flag in k for flag in ignore_flags)]
-
+        
         return key_list
 
     def update_pvs(self, pv_list):
