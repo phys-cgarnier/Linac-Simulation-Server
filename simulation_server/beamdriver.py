@@ -62,7 +62,7 @@ class SimServer(SimpleServer):
             if self.server._callback:
                 self.server._callback(op.name(), op.value())
 
-    def __init__(self, pvdb: dict, prefix: str = ""):
+    def __init__(self, pvdb: dict, prefix: str = "", threading: bool = True):
         """
         Parameters
         ----------
@@ -70,10 +70,13 @@ class SimServer(SimpleServer):
             Dict describing all records and their fields
         prefix : str
             PV name prefix
+        threading : bool
+            When set to True, enables threading and SIMULATE PV behavior
         """
         self._pva: Dict[str, SharedPV] = {}
         self._callback = None
         self._db = pvdb
+        self._threaded = threading
 
         # Add a PV to indicate both simulation status and to trigger simulation
         self.sim_pv_name = "VIRT:BEAM:SIMULATE"
@@ -109,6 +112,10 @@ class SimServer(SimpleServer):
         self._server = p4p.server.Server(providers=[self._pva])
         while True:
             self.process(0.001)
+
+    @property
+    def threaded(self) -> bool:
+        return self._threaded
 
     @property
     def pva_pvs(self) -> Dict[str, SharedPV]:
@@ -293,6 +300,17 @@ class SimDriver(Driver):
 
         self.thread.start()
 
+    def _set_and_simulate(self, new_data: dict):
+        """Updates PVs on the model, then updates the PV cache with results"""
+        start = time.time()
+
+        self.virtual_accelerator.set_pvs(new_data)
+
+        # update PV cache with new values, pump monitors
+        self.update_cache(self.measurement_pvs, True)
+
+        print(f"Simulation took {time.time() - start:.3f} seconds")
+
     def _model_update_thread(self):
         while True:
             # Unlocked by thread_cond.wait()
@@ -304,21 +322,13 @@ class SimDriver(Driver):
             start = time.time()
 
             # run simulation
-            print(self.new_data)
-            self.virtual_accelerator.set_pvs(self.new_data)
-
-            # update PV cache with new values
-            self.update_cache(self.measurement_pvs, True)
-
+            self._set_and_simulate(self.new_data)
             self.new_data = {}
-
-            print(f"Simulation took {time.time() - start:.3f} seconds")
 
             # Indicate that we're done simulating
             self.set_cached_value(self.server.sim_pv_name, 0, True)
 
             self.write_guard.release()
-
 
     def get_measurement_pvs(self):
         """Get a list of PVs that should be updated every time we write to a PV"""
@@ -432,9 +442,13 @@ class SimDriver(Driver):
                 self.thread_cond.notify_all()
             return
 
-        # Write an updated cache value. this may be updated later after model evaluation.
-        with self.pv_guard:
-            self.pv_cache[value] = reason
+        # Single threaded mode; do all updates immediately
+        if not self.server.threaded:
+            # Set new value for this PV and update monitors to make caput readback behave nicely
+            self.set_cached_value(reason, value, True)
+            # Set changed PVs, and update the new values
+            self._set_and_simulate({reason: value})
+            return
 
         with self.write_guard:
             # update the control PV fast
