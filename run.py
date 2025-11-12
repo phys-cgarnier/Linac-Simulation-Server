@@ -25,9 +25,10 @@ def run_simulation_server(name, monitor_overview, measurement_noise_level):
         raise ValueError(f"Unknown virtual accelerator name: {name}")
 
     PVDB = create_pvdb(devices)
+    
     va = get_virtual_accelerator(name, monitor_overview, measurement_noise_level)
     server = SimServer(PVDB)
-    driver = SimDriver(server=server, devices=devices, virtual_accelerator=va)
+    driver = SimDriver(server=server, virtual_accelerator=va)
 
     print("Starting simulated server")
     server.run()
