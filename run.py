@@ -16,7 +16,7 @@ def run_simulation_server(name, monitor_overview, measurement_noise_level):
             os.path.join( FILEPATH, "DIAG0.yaml")
         )
 
-    elif name == "nc_injector":
+    elif name in ("nc_injector", 'nc_hxr'):
         devices = load_relevant_controls(
             os.path.join( FILEPATH, "DL1.yaml")
             #os.path.join(FP,"simulation_server","yaml_configs", "DL1.yaml")
@@ -25,9 +25,10 @@ def run_simulation_server(name, monitor_overview, measurement_noise_level):
         raise ValueError(f"Unknown virtual accelerator name: {name}")
 
     PVDB = create_pvdb(devices)
+    
     va = get_virtual_accelerator(name, monitor_overview, measurement_noise_level)
     server = SimServer(PVDB)
-    driver = SimDriver(server=server, devices=devices, virtual_accelerator=va)
+    driver = SimDriver(server=server, virtual_accelerator=va)
 
     print("Starting simulated server")
     server.run()
