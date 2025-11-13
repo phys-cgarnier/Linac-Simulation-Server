@@ -16,7 +16,7 @@ def run_simulation_server(name, monitor_overview, measurement_noise_level):
             os.path.join( FILEPATH, "DIAG0.yaml")
         )
 
-    elif name == "nc_injector":
+    elif name in ("nc_injector", 'nc_hxr'):
         devices = load_relevant_controls(
             os.path.join( FILEPATH, "DL1.yaml")
             #os.path.join(FP,"simulation_server","yaml_configs", "DL1.yaml")
@@ -56,6 +56,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+    print(args)
     run_simulation_server(
         args.name, args.monitor_overview, args.measurement_noise_level
     )
