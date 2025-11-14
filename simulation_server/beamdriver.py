@@ -260,7 +260,7 @@ class SimDriver(Driver):
         self.virtual_accelerator = virtual_accelerator
 
         self.server = server
-
+        self.omitted = []
 
         # get list of pvs that should be updated every time we write to a PV
         self.measurement_pvs = self.get_measurement_pvs()
@@ -307,7 +307,14 @@ class SimDriver(Driver):
         print("PVs updated.")
 
     def read(self, reason):
-        value = self.virtual_accelerator.get_pvs([reason])[reason]
+        try:
+            value = self.virtual_accelerator.get_pvs([reason])[reason]
+        except AttributeError as e:
+            if reason not in self.omitted:
+                self.omitted.append(reason)
+                print(f"Error getting param for {reason}: {e}, do not use {reason}")
+            return 0
+
         self.server.set_pv(reason, value)
         try:
             self.setParam(reason, value)
