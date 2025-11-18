@@ -61,7 +61,6 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    assert not args.monitor_overview
     run_simulation_server(
         args.name, args.monitor_overview, args.measurement_noise_level, args.threaded
     )

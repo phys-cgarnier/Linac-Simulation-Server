@@ -8,6 +8,7 @@ import p4p
 from typing import Dict, Callable, Any
 from simulation_server.virtual_accelerator import VirtualAccelerator
 import threading
+from .utils.timer import Timer
 
 class SimServer(SimpleServer):
     """
@@ -82,6 +83,10 @@ class SimServer(SimpleServer):
         self.sim_pv_name = "VIRT:BEAM:SIMULATE"
         self._db[self.sim_pv_name] = {
             "value": 0
+        }
+        self.sim_timeout_name = "VIRT:BEAM:SIMULATE_TIMEOUT"
+        self._db[self.sim_timeout_name] = {
+            "value": 0.5
         }
 
         # Create CA PVs
@@ -287,6 +292,8 @@ class SimDriver(Driver):
         self.thread = threading.Thread(target=self._model_update_thread)
         self.new_data = {}
 
+        self.timer = Timer(0.5, self._trigger_sim, periodic=True, manual=True)
+
         # get list of pvs that should be updated every time we write to a PV
         self.measurement_pvs = self.get_measurement_pvs()
 
@@ -299,6 +306,12 @@ class SimDriver(Driver):
         self.update_cache(self.measurement_pvs, True)
 
         self.thread.start()
+        if self.server.threaded:
+            self.timer.start()
+
+    def _trigger_sim(self):
+        with self.write_guard:
+            self.thread_cond.notify_all()
 
     def _set_and_simulate(self, new_data: dict):
         """Updates PVs on the model, then updates the PV cache with results"""
@@ -316,8 +329,10 @@ class SimDriver(Driver):
             # Unlocked by thread_cond.wait()
             self.write_guard.acquire()
 
-            # Wait for a trigger
+            # Wait for a trigger (unlocks write_guard)
             self.thread_cond.wait()
+
+            print('Simulation triggered')
 
             start = time.time()
 
@@ -435,24 +450,32 @@ class SimDriver(Driver):
         """write to a PV, run the simulation, and then update all other PVs"""
         print(f"Writing {value} to {reason}")
 
+        # Update internal values quickly so readbacks dont fail
+        self.set_cached_value(reason, value, True)
+
+        # Halt countdown
+        self.timer.cancel()
+
         # Re-run the entire simulation if requested
         if reason == self.server.sim_pv_name:
             with self.write_guard:
-                self.set_cached_value(reason, value, True)
                 self.thread_cond.notify_all()
+            return
+
+        # Adjust simulation timeout
+        if reason == self.server.sim_timeout_name:
+            self.timer.interval = int(value)
             return
 
         # Single threaded mode; do all updates immediately
         if not self.server.threaded:
-            # Set new value for this PV and update monitors to make caput readback behave nicely
-            self.set_cached_value(reason, value, True)
             # Set changed PVs, and update the new values
             self._set_and_simulate({reason: value})
             return
 
         with self.write_guard:
-            # update the control PV fast
-            self.set_cached_value(reason, value, True)
-
             # this is sent to the updater thread
             self.new_data[reason] = value
+
+            # Begin simulation timeout period
+            self.timer.reset()
