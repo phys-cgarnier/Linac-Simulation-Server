@@ -22,6 +22,7 @@ class VirtualAccelerator:
         beam_shutter_pv=None,
         monitor_overview=False,
         measurement_noise_level=None,
+        subcell_dest= None
     ):
         """
         Virtual accelerator class based on cheetah beam dynamics simulations.
@@ -58,6 +59,8 @@ class VirtualAccelerator:
                 ele.method = "histogram"
 
         self.lattice = lattice
+        if subcell_dest:
+            self.lattice = lattice.subcell(end=subcell_dest)
 
         self.mapping = get_pv_mad_mapping(mapping_file)
 

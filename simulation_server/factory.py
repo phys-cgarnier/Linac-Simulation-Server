@@ -48,8 +48,9 @@ def get_virtual_accelerator(name, monitor_overview=False, measurement_noise_leve
 
         mapping_file = os.path.join(FILEPATH, "mappings", "lcls_elements.csv")
         lattice_file = os.path.join(LCLS_LATTICE, "sc_diag0.json")
-
-    elif name == "nc_injector":
+        subcell_dest = None
+        
+    elif name in ("nc_injector", 'nc_hxr'):
         incoming_beam = ParticleBeam.from_openpmd_file(
             path=os.path.join(FILEPATH, "beams", "impact_inj_output_YAG03.h5"),
             energy=torch.tensor(64e6),
@@ -60,10 +61,16 @@ def get_virtual_accelerator(name, monitor_overview=False, measurement_noise_leve
         mapping_file = os.path.join(FILEPATH, "mappings", "lcls_elements.csv") 
         lattice_file = os.path.join(LCLS_LATTICE,"nc_hxr.json")
 
+        if name == "nc_injector":
+            subcell_dest = 'otr2'
+        else:
+            subcell_dest = None
+
     return VirtualAccelerator(
         lattice_file=lattice_file,
         initial_beam_distribution=incoming_beam,
         mapping_file=mapping_file,
         monitor_overview=monitor_overview,
         measurement_noise_level=measurement_noise_level,
+        subcell_dest=subcell_dest
     )
