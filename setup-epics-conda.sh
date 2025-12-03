@@ -7,7 +7,7 @@
 LINAC_SIM_SERVER_CA_PORT=${LINAC_SIM_SERVER_CA_PORT:-10512} # `:-` is bash syntax, not negative num
 LINAC_SIM_SERVER_PVA_PORT=${LINAC_SIM_SERVER_PVA_PORT:-10415}
 
-if [ -f /sdf/group/cds/sw/epics/setup/setupEpics.bash ]; then
+if [ -f /sdf/group/cds/sw/epics/setup/setupEpics.bash ] && [ -z "$USE_LOCAL_CONDA" ]; then
      echo "Sourcing EPICS and conda from /sdf/group/cds/sw/epics"
      source /sdf/group/cds/sw/epics/setup/setupEpics.bash
      source /sdf/sw/epics/package/anaconda/envs/rhel7_devel/bin/activate
