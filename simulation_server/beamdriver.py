@@ -86,7 +86,7 @@ class SimServer(SimpleServer):
         }
         self.sim_timeout_name = "VIRT:BEAM:SIMULATE_TIMEOUT"
         self._db[self.sim_timeout_name] = {
-            "value": 0.5
+            "value": 0
         }
 
         # Create CA PVs
@@ -292,7 +292,8 @@ class SimDriver(Driver):
         self.thread = threading.Thread(target=self._model_update_thread)
         self.new_data = {}
 
-        self.timer = Timer(0.5, self._trigger_sim, periodic=True, manual=True)
+        # Configure for instant simulation by default
+        self.timer = Timer(0, self._trigger_sim, periodic=True, manual=True)
 
         # get list of pvs that should be updated every time we write to a PV
         self.measurement_pvs = self.get_measurement_pvs()
@@ -329,21 +330,27 @@ class SimDriver(Driver):
             # Unlocked by thread_cond.wait()
             self.write_guard.acquire()
 
-            # Wait for a trigger (unlocks write_guard)
-            self.thread_cond.wait()
+            # Wait for a trigger if no additional data is ready (unlocks write_guard)
+            if len(self.new_data.keys()) == 0:
+                self.thread_cond.wait()
 
-            print('Simulation triggered')
+            # Grab updated data
+            new_data = self.new_data.copy()
+            self.new_data = {}
+
+            # Done with the write guard
+            self.write_guard.release()
+
+            print(f'Simulation triggered')
 
             start = time.time()
 
             # run simulation
-            self._set_and_simulate(self.new_data)
-            self.new_data = {}
+            self._set_and_simulate(new_data)
 
             # Indicate that we're done simulating
             self.set_cached_value(self.server.sim_pv_name, 0, True)
 
-            self.write_guard.release()
 
     def get_measurement_pvs(self):
         """Get a list of PVs that should be updated every time we write to a PV"""
