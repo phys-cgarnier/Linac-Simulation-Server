@@ -18,4 +18,4 @@ OVERVIEW="${3:-}"
 NOISE="${4:-0.0}"
 # Start the server
 echo "Starting server..."
-python3 run.py --name "$NAME" --monitor_overview "$OVERVIEW" --measurement_noise_level "$NOISE"
+python3 run.py --name "$NAME" --monitor_overview "$OVERVIEW" --measurement_noise_level "$NOISE" --threaded
