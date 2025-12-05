@@ -291,6 +291,7 @@ class SimDriver(Driver):
         self.thread_cond = threading.Condition(self.write_guard)
         self.thread = threading.Thread(target=self._model_update_thread)
         self.new_data = {}
+        self.omitted = []
 
         # Configure for instant simulation by default
         self.timer = Timer(0, self._trigger_sim, periodic=True, manual=True)
@@ -318,7 +319,13 @@ class SimDriver(Driver):
         """Updates PVs on the model, then updates the PV cache with results"""
         start = time.time()
 
-        self.virtual_accelerator.set_pvs(new_data)
+        for k in new_data.keys():
+            if k in self.omitted:
+                continue
+            try:
+                self.virtual_accelerator.set_pvs({k: new_data[k]})
+            except AttributeError:
+                pass # Added to the omitted list later
 
         # update PV cache with new values, pump monitors
         self.update_cache(self.measurement_pvs, True)
@@ -395,7 +402,16 @@ class SimDriver(Driver):
         """
         self.pv_guard.acquire()
         for name in pv_list:
-            value = self.virtual_accelerator.get_pvs([name])[name]
+            if name in self.omitted:
+                continue
+            try:
+                value = self.virtual_accelerator.get_pvs([name])[name]
+            except AttributeError as e:
+                # Attributes that error out should be omitted in subsequent runs
+                if name not in self.omitted:
+                    self.omitted.append(name)
+                    print(f'Error getting param "{name}": {e}, do not use {name}')
+                continue
             self.pv_cache[name] = value
             if post_monitors:
                 self.server.set_pv(name, value)
