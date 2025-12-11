@@ -102,7 +102,7 @@ class SimServer(SimpleServer):
 
         super().__init__()
 
-    def set_update_callback(self, callable: Callable[[str, Any], None]):
+    def set_update_callback(self, callable: Callable[[str, Any], Any]):
         """
         Sets the PV update callback. This will be invoked when any PV is written to using PVA
 
@@ -483,18 +483,18 @@ class SimDriver(Driver):
         if reason == self.server.sim_pv_name:
             with self.write_guard:
                 self.thread_cond.notify_all()
-            return
+            return True
 
         # Adjust simulation timeout
         if reason == self.server.sim_timeout_name:
             self.timer.interval = int(value)
-            return
+            return True
 
         # Single threaded mode; do all updates immediately
         if not self.server.threaded:
             # Set changed PVs, and update the new values
             self._set_and_simulate({reason: value})
-            return
+            return True
 
         with self.write_guard:
             # this is sent to the updater thread
@@ -502,3 +502,5 @@ class SimDriver(Driver):
 
             # Begin simulation timeout period
             self.timer.reset()
+
+        return True
