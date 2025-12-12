@@ -56,16 +56,6 @@ def create_pvdb(device: dict, **default_params) -> dict:
                 },
             }
 
-            # Create DRVL/DRVH/HOPR/LOPR PVs, since pcaspy doesn't do that for us.
-            new_pvs = {}
-            for k, v in device_params.items():
-                for parm, val in v.items():
-                    if parm in ["type", "value"]:
-                        continue
-                    new_pvs[f"{k}.{parm.upper()}"] = {"type": "float", "value": val}
-            device_params.update(new_pvs)
-
-
         elif "OTRS" in key:
             n_row = default_params.get("n_row", 1944)
             n_col = default_params.get("n_col", 1472)
@@ -99,10 +89,12 @@ def create_pvdb(device: dict, **default_params) -> dict:
                 },
                 get_pv("rf_enable"): {"type": "enum", "enums": ["Disable", "Enable"]},
                 get_pv("amplitude"): {
+                    "type": "float",
                     "value": 0.0,
                     "prec": 5,
                 },
                 get_pv("phase"): {
+                    "type": "float",
                     "value": 0.0,
                     "prec": 5,
                 },
@@ -123,6 +115,17 @@ def create_pvdb(device: dict, **default_params) -> dict:
         #check in the key had missing pv values if so omit it since lcls_elements.csv did not agree with yaml
         if any('missing' in pkey for pkey in device_params.keys()):
             continue
+
+        # Create DRVL/DRVH/HOPR/LOPR PVs, since pcaspy doesn't do that for us.
+        new_pvs = {}
+        for k, v in device_params.items():
+            if "type" in v and v["type"] not in ["float", "int"]:
+                continue
+            for parm, val in v.items():
+                if parm in ["type", "value"]:
+                    continue
+                new_pvs[f"{k}.{parm.upper()}"] = {"type": "float", "value": val}
+        device_params.update(new_pvs)
 
         #update pvdb with device pvs
         pvdb.update(device_params)
