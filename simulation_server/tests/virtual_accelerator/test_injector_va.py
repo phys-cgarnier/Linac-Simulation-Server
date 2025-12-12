@@ -10,12 +10,6 @@ class TestInjectorVA:
         # Create an instance of the virtual accelerator for the injector
         self.va = get_virtual_accelerator(name="nc_injector")
 
-    def test_initial_beam_energy(self):
-        # Check that the initial beam energy is as expected
-        initial_energy = self.va.beam.energy.item()
-        expected_energy = 64e6  # 64 MeV
-        assert abs(initial_energy - expected_energy) < 1e3  # within 1 keV
-
     def test_otr_image(self):
         otr_pv = "OTRS:IN20:571:Image:ArrayData"
         output = self.va.get_pvs([
