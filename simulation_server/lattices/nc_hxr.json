@@ -75,7 +75,7 @@
         "dh01": ["Drift", {"length": 0.14182840287685394, "tracking_method": "cheetah"}],
         "bxh2": ["Dipole", {"length": 0.12476039677858353, "angle": 0.13170939683914185, "k1": 0.0, "dipole_e1": 0.13170939683914185, "dipole_e2": 0.0, "tilt": 0.0, "gap": 0.029999999329447746, "gap_exit": 0.029999999329447746, "fringe_integral": 0.4000000059604645, "fringe_integral_exit": 0.4000000059604645, "fringe_at": "both", "fringe_type": "linear_edge", "tracking_method": "cheetah"}],
         "dh02a": ["Drift", {"length": 0.059970200061798096, "tracking_method": "cheetah"}],
-        "otrh1": ["Screen", {"resolution": [1040,1392],"pixel_size": [18.59e-6,18.59e-6],"is_active": true}],
+        "otrh1": ["Screen", {"resolution": [1392,1040],"pixel_size": [18.59e-6,18.59e-6],"is_active": true}],
         "dh03a": ["Drift", {"length": 0.07603974640369415, "tracking_method": "cheetah"}],
         "lh_und": ["Undulator", {"length": 0.5400000214576721}],
         "dh03b": ["Drift", {"length": 0.0671498030424118, "tracking_method": "cheetah"}],
