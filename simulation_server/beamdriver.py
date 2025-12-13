@@ -304,8 +304,9 @@ class SimDriver(Driver):
         for k in key_list:
             self.pv_cache[k] = self.server.pva_pvs[k].current()
 
-        # Run an initial update of simulated variables
-        self.update_cache(self.measurement_pvs, True)
+        # Run an initial update (this will also propagate CA/PVA changes)
+        new_data = {x: self.pv_cache[x] for x in self.measurement_pvs}
+        self._set_and_simulate(new_data)
 
         self.thread.start()
         if self.server.threaded:
@@ -326,6 +327,8 @@ class SimDriver(Driver):
                 self.virtual_accelerator.set_pvs({k: new_data[k]})
             except AttributeError:
                 pass # Added to the omitted list later
+            except ValueError:
+                pass # Usually this means the attribute has no set method. Just going to ignore
 
         # update PV cache with new values, pump monitors
         self.update_cache(self.measurement_pvs, True)
