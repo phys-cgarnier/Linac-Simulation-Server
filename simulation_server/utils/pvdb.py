@@ -1,7 +1,10 @@
 import pprint
 
 
-def create_pvdb(device: dict, default_params) -> dict:
+def create_pvdb(
+        device: dict[str,dict],
+        default_params: dict[str,dict] = {}
+        ) -> dict:
     pvdb = {}
     # pprint.pprint(default_params)
     for key, device_info in device.items():
@@ -57,8 +60,10 @@ def create_pvdb(device: dict, default_params) -> dict:
             }
 
         elif "OTRS" in key:
-            n_row = default_params.get("n_row", 1944)
-            n_col = default_params.get("n_col", 1472)
+            madname = device_info.get("madname","").upper()
+            n_row = default_params.get(madname,{}).get("n_row", 1944)
+            n_col = default_params.get(madname,{}).get("n_col", 1472)
+            resolution = default_params.get(madname,{}).get("resolution", 23.33)
             device_params = {
                 get_pv("image"): {
                     "type": "float",
@@ -69,7 +74,7 @@ def create_pvdb(device: dict, default_params) -> dict:
                 get_pv("n_row"): {"type": "int", "value": n_row},
                 get_pv("n_col"): {"type": "int", "value": n_col},
                 get_pv("resolution"): {
-                    "value": default_params.get("resolution", 23.33),
+                    "value": resolution,
                     "unit": "um/px",
                 },
                 get_pv("target_control"): {"type": "enum", "enums": ["OUT", "IN"]},
