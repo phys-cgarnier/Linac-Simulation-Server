@@ -249,6 +249,7 @@ class VirtualAccelerator:
                 if ele.shape == torch.Size([]):
                     values[name] = ele.item()
                 elif len(ele.shape) > 0:
+                    ele = ele.T
                     values[name] = ele.flatten().tolist()
 
         # add noise to signals if requested
