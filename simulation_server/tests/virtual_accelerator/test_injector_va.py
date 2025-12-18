@@ -18,8 +18,8 @@ class TestInjectorVA:
             "OTRS:IN20:571:Image:ArraySize0_RBV",
         ])
         image = output[otr_pv]
-        size_x = output["OTRS:IN20:571:Image:ArraySize0_RBV"]
-        size_y = output["OTRS:IN20:571:Image:ArraySize1_RBV"]
+        size_y = output["OTRS:IN20:571:Image:ArraySize0_RBV"]
+        size_x = output["OTRS:IN20:571:Image:ArraySize1_RBV"]
         image = np.array(image).reshape((size_x, size_y))
 
         plt.figure()
