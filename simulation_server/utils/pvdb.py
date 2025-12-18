@@ -61,8 +61,8 @@ def create_pvdb(
 
         elif "OTRS" in key:
             madname = device_info.get("madname","").upper()
-            n_row = default_params.get(madname,{}).get("n_row", 1944)
-            n_col = default_params.get(madname,{}).get("n_col", 1472)
+            n_row = default_params.get(madname,{}).get("n_row", 1472)
+            n_col = default_params.get(madname,{}).get("n_col", 1944)
             resolution = default_params.get(madname,{}).get("resolution", 23.33)
             device_params = {
                 get_pv("image"): {
