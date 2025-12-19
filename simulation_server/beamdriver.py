@@ -304,6 +304,15 @@ class SimDriver(Driver):
         for k in key_list:
             self.pv_cache[k] = self.server.pva_pvs[k].current()
 
+        # Initialize the cache
+        self.update_cache(self.measurement_pvs, False)
+
+        # Map BACT initial value to BCTRL
+        for k in key_list:
+            if not k.endswith(':BACT'):
+                continue
+            self.set_cached_value(k.replace(':BACT', ':BCTRL'), self.cached_value(k), True)
+
         # Run an initial update (this will also propagate CA/PVA changes)
         new_data = {x: self.pv_cache[x] for x in self.measurement_pvs}
         self._set_and_simulate(new_data)
