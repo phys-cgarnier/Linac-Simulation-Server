@@ -1,7 +1,10 @@
 import pprint
 
 
-def create_pvdb(device: dict, **default_params) -> dict:
+def create_pvdb(
+        device: dict[str,dict],
+        default_params: dict[str,dict] = {}
+        ) -> dict:
     pvdb = {}
     # pprint.pprint(default_params)
     for key, device_info in device.items():
@@ -56,19 +59,11 @@ def create_pvdb(device: dict, **default_params) -> dict:
                 },
             }
 
-            # Create DRVL/DRVH/HOPR/LOPR PVs, since pcaspy doesn't do that for us.
-            new_pvs = {}
-            for k, v in device_params.items():
-                for parm, val in v.items():
-                    if parm in ["type", "value"]:
-                        continue
-                    new_pvs[f"{k}.{parm.upper()}"] = {"type": "float", "value": val}
-            device_params.update(new_pvs)
-
-
         elif "OTRS" in key:
-            n_row = default_params.get("n_row", 1944)
-            n_col = default_params.get("n_col", 1472)
+            madname = device_info.get("madname","").upper()
+            n_row = default_params.get(madname,{}).get("n_row", 1472)
+            n_col = default_params.get(madname,{}).get("n_col", 1944)
+            resolution = default_params.get(madname,{}).get("resolution", 23.33)
             device_params = {
                 get_pv("image"): {
                     "type": "float",
@@ -79,7 +74,7 @@ def create_pvdb(device: dict, **default_params) -> dict:
                 get_pv("n_row"): {"type": "int", "value": n_row},
                 get_pv("n_col"): {"type": "int", "value": n_col},
                 get_pv("resolution"): {
-                    "value": default_params.get("resolution", 23.33),
+                    "value": resolution,
                     "unit": "um/px",
                 },
                 get_pv("target_control"): {"type": "enum", "enums": ["OUT", "IN"]},
@@ -99,10 +94,12 @@ def create_pvdb(device: dict, **default_params) -> dict:
                 },
                 get_pv("rf_enable"): {"type": "enum", "enums": ["Disable", "Enable"]},
                 get_pv("amplitude"): {
+                    "type": "float",
                     "value": 0.0,
                     "prec": 5,
                 },
                 get_pv("phase"): {
+                    "type": "float",
                     "value": 0.0,
                     "prec": 5,
                 },
@@ -123,6 +120,17 @@ def create_pvdb(device: dict, **default_params) -> dict:
         #check in the key had missing pv values if so omit it since lcls_elements.csv did not agree with yaml
         if any('missing' in pkey for pkey in device_params.keys()):
             continue
+
+        # Create DRVL/DRVH/HOPR/LOPR PVs, since pcaspy doesn't do that for us.
+        new_pvs = {}
+        for k, v in device_params.items():
+            if "type" in v and v["type"] not in ["float", "int"]:
+                continue
+            for parm, val in v.items():
+                if parm in ["type", "value"]:
+                    continue
+                new_pvs[f"{k}.{parm.upper()}"] = {"type": "float", "value": val}
+        device_params.update(new_pvs)
 
         #update pvdb with device pvs
         pvdb.update(device_params)
