@@ -308,8 +308,8 @@ class SimDriver(Driver):
         self.update_cache(self.measurement_pvs, False)
 
         # Map BACT initial value to BCTRL
-        for k in key_list:
-            if not k.endswith(':BACT'):
+        for k in self.measurement_pvs:
+            if not k.endswith(':BACT') or k in self.omitted:
                 continue
             self.set_cached_value(k.replace(':BACT', ':BCTRL'), self.cached_value(k), True)
 
