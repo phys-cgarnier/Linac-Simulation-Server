@@ -15,15 +15,14 @@ FILEPATH= pathlib.Path(yaml_directory.__file__).parent.resolve()
 def run_simulation_server(name, monitor_overview, measurement_noise_level, threaded):
     if name == "diag0":
         devices = load_relevant_controls(
-            os.path.join( FILEPATH, "DIAG0.yaml")
+            [os.path.join( FILEPATH, "DIAG0.yaml")]
         )
         default_params = default_sc_diag0
 
     elif name in ("nc_injector", 'nc_hxr'):
-        devices = load_relevant_controls(
-            os.path.join( FILEPATH, "DL1.yaml")
-            #os.path.join(FP,"simulation_server","yaml_configs", "DL1.yaml")
-        )
+        rel_areas = ["GUN.yaml", "L0.yaml", "DL1.yaml"]
+        filepaths = [os.path.join( FILEPATH, area) for area in rel_areas]
+        devices = load_relevant_controls(filepaths)
         default_params = default_nc_hxr
 
     else:
