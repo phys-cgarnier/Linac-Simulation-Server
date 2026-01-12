@@ -97,9 +97,7 @@ class SimServer(SimpleServer):
         for k, v in self._db.items():
             # Get last field
             s = k.rsplit(':', 1)[-1]
-            print(s)
             if s in self.unassoc_pvs:
-                print('yes')
                 self._pva.update(self._build_pv(f"{prefix}{k}", v, False))
             elif k.rfind(".") != -1:
                 continue
