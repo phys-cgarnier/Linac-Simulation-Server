@@ -57,6 +57,10 @@ def create_pvdb(
                     "type": "enum",
                     "enums": ["Ready", "TRIM", "Perturb", "MORE_IF_NEEDED"],
                 },
+                f"{key}:STATCTRLSUB.T": {
+                    "type": "int",
+                    "value": 0
+                }
             }
 
         elif "OTRS" in key:
