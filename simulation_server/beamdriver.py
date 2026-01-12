@@ -96,11 +96,11 @@ class SimServer(SimpleServer):
         # Create PVA PVs
         for k, v in self._db.items():
             if 'STATCTRLSUB' in k:
-                self._pva.update(self._build_unassociated_pv(f"{prefix}{k}", v))
+                self._pva.update(self._build_pv(f"{prefix}{k}", v, False))
             elif k.rfind(".") != -1 and 'STATCTRLSUB' not in k:
                 continue
             else:
-                self._pva.update(self._build_pv(f"{prefix}{k}", v))
+                self._pva.update(self._build_pv(f"{prefix}{k}", v, True))
         
         pprint.pprint(self._pva)
         self.sim_pv = self._pva[self.sim_pv_name]
@@ -190,48 +190,47 @@ class SimServer(SimpleServer):
         self._pva[name].post(value, timestamp=time.time())
 
 
-    def _build_nt(self, desc: dict, assoc) -> Tuple[Any, Any, bool]:
+    def _build_nt(self, desc: dict, assoc: bool) -> Tuple[Any, Any, bool]:
         """
         Decide the Normative Type (NT) object + initial value for a PV record.
-
-        Returns
-        -------
-        nt : NT type instance (e.g., NTScalar/NTEnum/NTNDArray)
-        default : initial value appropriate for that NT
-        is_image : bool, True if this represents an NDArray/image PV
+        Policy:
+         Assoc flag controls whether we include extra NT metadata (control/display/valueAlarm).
         """
-        # Ensure a default type
+
         pv_type = desc.get("type", "float")
-        desc["type"] = pv_type  # keep existing behavior (mutates desc)
+        desc["type"] = pv_type  # keep compat with code that reads desc["type"]
 
         is_image = False
 
-        match pv_type:
-            case "enum":
-                nt = NTEnum(control=assoc, display=assoc, valueAlarm=assoc)
-                default = {
-                    "index": desc["value"] if "value" in desc else 0,
-                    "choices": desc["enums"],
-                }
+        # decide metadata policy here
+        meta = dict(control=assoc, display=assoc, valueAlarm=assoc)
 
-            case "int":
-                nt = NTScalar("i", control=assoc, display=assoc, valueAlarm=assoc)
-                default = desc["value"] if "value" in desc else 0
+        if pv_type == "enum":
+            nt = NTEnum(**meta)
+            default = {
+                "index": desc["value"] if "value" in desc else 0,
+                "choices": desc["enums"],
+            }
+            return nt, default, is_image
 
-            case "float":
-                # If we have count + n_col, it's actually an array (image)
-                if "count" in desc and "n_col" in desc:
-                    default = np.zeros((desc["n_col"], desc["n_row"]), dtype=float)
-                    nt = NTNDArray()
-                    is_image = True
-                else:
-                    nt = NTScalar("d", control=assoc, display=assoc, valueAlarm=assoc)
-                    default = float(desc["value"]) if "value" in desc else 0.0
+        elif pv_type == "int":
+            nt = NTScalar("i", **meta)
+            default = desc["value"] if "value" in desc else 0
+            return nt, default, is_image
 
-            case _:
-                raise Exception(f'Unhandled type "{pv_type}"')
+        elif pv_type == "float":
+            # If we have count + n_col, it's actually an array (image)
+            if "count" in desc and "n_col" in desc:
+                default = np.zeros((desc["n_col"], desc["n_row"]), dtype=float)
+                nt = NTNDArray()  # NDArray doesn't use control/display/valueAlarm knobs
+                is_image = True
+            else:
+                nt = NTScalar("d", **meta)
+                default = float(desc["value"]) if "value" in desc else 0.0
+            return nt, default, is_image
 
-        return nt, default, is_image
+        raise Exception(f'Unhandled type "{pv_type}"')
+
 
 
     def _build_pv(self, name: str, desc: dict, assoc: bool = True) -> Dict[str, SharedPV]:
@@ -240,7 +239,7 @@ class SimServer(SimpleServer):
         """
         r: Dict[str, SharedPV] = {}
 
-        nt, default, is_image = self._build_nt(desc,assoc)
+        nt, default, is_image = self._build_nt(desc, assoc)
 
         # Special control fields and status fields
         controls = ["enums", "type", "value", "count", "n_col", "n_row"]
@@ -262,27 +261,27 @@ class SimServer(SimpleServer):
             cur = nt.wrap(val_pv.current())
         else:
             cur = None
+        if assoc:
+            # Build generic fields
+            for k, v in desc.items():
+                if k in controls:
+                    continue  # Skip special values
 
-        # Build generic fields
-        for k, v in desc.items():
-            if k in controls:
-                continue  # Skip special values
+                field = self._db_to_pv(k.lower())  # (kept; even if unused elsewhere)
 
-            field = self._db_to_pv(k.lower())  # (kept; even if unused elsewhere)
+                # Determine any association with the "parent" (value) PV
+                sub = self._pv_assoc(k)
+                par_pv = val_pv if sub else None
 
-            # Determine any association with the "parent" (value) PV
-            sub = self._pv_assoc(k)
-            par_pv = val_pv if sub else None
+                # Build a PV for each field
+                r[f"{name}.{k.upper()}"] = SharedPV(
+                    nt=NTScalar(self._type_desc(v)),
+                    initial=v,
+                    handler=SimServer.UpdateHandler(self, parent=par_pv, subfield=sub),
+                )
 
-            # Build a PV for each field
-            r[f"{name}.{k.upper()}"] = SharedPV(
-                nt=NTScalar(self._type_desc(v)),
-                initial=v,
-                handler=SimServer.UpdateHandler(self, parent=par_pv, subfield=sub),
-            )
-
-            if sub and cur:
-                cur[sub] = v
+                if sub and cur:
+                    cur[sub] = v
 
         # Post the "real" value to the value PV, including all fields
         if cur:
@@ -493,8 +492,7 @@ class SimDriver(Driver):
     def read(self, reason):
         # grab latest value from the cache
         value = self.cached_value(reason)
-        if 'STATCTRLSUB' in reason:
-            print(reason)
+
         try:
             self.setParam(reason, value)
         except Exception as e:
@@ -505,7 +503,7 @@ class SimDriver(Driver):
 
     def write(self, reason, value):
         """write to a PV, run the simulation, and then update all other PVs"""
-        print(f"Writing {value} to {reason}")
+        #print(f"Writing {value} to {reason}")
 
         # Update internal values quickly so readbacks dont fail
         self.set_cached_value(reason, value, True)
