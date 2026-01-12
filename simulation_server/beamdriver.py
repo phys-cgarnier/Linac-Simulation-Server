@@ -79,7 +79,7 @@ class SimServer(SimpleServer):
         self._callback = None
         self._db = pvdb
         self._threaded = threading
-
+        self.unassoc_pvs = ['STATCTRLSUB.T']
         # Add a PV to indicate both simulation status and to trigger simulation
         self.sim_pv_name = "VIRT:BEAM:SIMULATE"
         self._db[self.sim_pv_name] = {
@@ -95,14 +95,18 @@ class SimServer(SimpleServer):
 
         # Create PVA PVs
         for k, v in self._db.items():
-            if 'STATCTRLSUB' in k:
+            # Get last field
+            s = k.rsplit(':', 1)[-1]
+            print(s)
+            if s in self.unassoc_pvs:
+                print('yes')
                 self._pva.update(self._build_pv(f"{prefix}{k}", v, False))
-            elif k.rfind(".") != -1 and 'STATCTRLSUB' not in k:
+            elif k.rfind(".") != -1:
                 continue
             else:
-                self._pva.update(self._build_pv(f"{prefix}{k}", v, True))
+               self._pva.update(self._build_pv(f"{prefix}{k}", v, True))
         
-        pprint.pprint(self._pva)
+        
         self.sim_pv = self._pva[self.sim_pv_name]
 
         super().__init__()
