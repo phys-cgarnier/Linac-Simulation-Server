@@ -5,10 +5,11 @@ import numpy as np
 from p4p.server.thread import SharedPV
 from p4p.nt import NTScalar, NTNDArray, NTEnum
 import p4p
-from typing import Dict, Callable, Any
+from typing import Dict, Callable, Any, Tuple
 from simulation_server.virtual_accelerator import VirtualAccelerator
 import threading
 from .utils.timer import Timer
+import pprint
 
 class SimServer(SimpleServer):
     """
@@ -94,10 +95,14 @@ class SimServer(SimpleServer):
 
         # Create PVA PVs
         for k, v in self._db.items():
-            if k.rfind(".") != -1:
+            if 'STATCTRLSUB' in k:
+                self._pva.update(self._build_unassociated_pv(f"{prefix}{k}", v))
+            elif k.rfind(".") != -1 and 'STATCTRLSUB' not in k:
                 continue
-            self._pva.update(self._build_pv(f"{prefix}{k}", v))
-
+            else:
+                self._pva.update(self._build_pv(f"{prefix}{k}", v))
+        
+        pprint.pprint(self._pva)
         self.sim_pv = self._pva[self.sim_pv_name]
 
         super().__init__()
@@ -171,48 +176,71 @@ class SimServer(SimpleServer):
         except:
             return None
 
-    def _build_pv(self, name: str, desc: dict) -> Dict[str, SharedPV]:
+    def set_pv(self, name: str, value):
         """
-        Builds several PVs to form the record described by 'desc'
+        Update a PVA PV with a new value
 
         Parameters
         ----------
         name : str
-            PV base name
-        desc : dict
-            Description ordinarily passed to pcaspy
+            Full name of PV including field
+        value : Any
+            Value to set
+        """
+        self._pva[name].post(value, timestamp=time.time())
+
+
+    def _build_nt(self, desc: dict, assoc) -> Tuple[Any, Any, bool]:
+        """
+        Decide the Normative Type (NT) object + initial value for a PV record.
 
         Returns
         -------
-        Dict[str, SharedPV]
-            Dict mapping PV name -> SharedPV instance
+        nt : NT type instance (e.g., NTScalar/NTEnum/NTNDArray)
+        default : initial value appropriate for that NT
+        is_image : bool, True if this represents an NDArray/image PV
         """
-        r = {}
-        if not "type" in desc:
-            desc["type"] = "float"
+        # Ensure a default type
+        pv_type = desc.get("type", "float")
+        desc["type"] = pv_type  # keep existing behavior (mutates desc)
 
         is_image = False
-        match desc["type"]:
+
+        match pv_type:
             case "enum":
-                nt = NTEnum(control=True, display=True, valueAlarm=True)
+                nt = NTEnum(control=assoc, display=assoc, valueAlarm=assoc)
                 default = {
                     "index": desc["value"] if "value" in desc else 0,
                     "choices": desc["enums"],
                 }
+
             case "int":
-                nt = NTScalar("i", control=True, display=True, valueAlarm=True)
+                nt = NTScalar("i", control=assoc, display=assoc, valueAlarm=assoc)
                 default = desc["value"] if "value" in desc else 0
+
             case "float":
-                # If we have count, it's actually an array (image)
+                # If we have count + n_col, it's actually an array (image)
                 if "count" in desc and "n_col" in desc:
                     default = np.zeros((desc["n_col"], desc["n_row"]), dtype=float)
                     nt = NTNDArray()
                     is_image = True
                 else:
-                    nt = NTScalar("d", control=True, display=True, valueAlarm=True)
+                    nt = NTScalar("d", control=assoc, display=assoc, valueAlarm=assoc)
                     default = float(desc["value"]) if "value" in desc else 0.0
+
             case _:
-                raise Exception(f'Unhandled type "{desc["type"]}"')
+                raise Exception(f'Unhandled type "{pv_type}"')
+
+        return nt, default, is_image
+
+
+    def _build_pv(self, name: str, desc: dict, assoc: bool = True) -> Dict[str, SharedPV]:
+        """
+        Builds several PVs to form the record described by 'desc'
+        """
+        r: Dict[str, SharedPV] = {}
+
+        nt, default, is_image = self._build_nt(desc,assoc)
 
         # Special control fields and status fields
         controls = ["enums", "type", "value", "count", "n_col", "n_row"]
@@ -223,10 +251,13 @@ class SimServer(SimpleServer):
             initial=default,
             handler=SimServer.UpdateHandler(self),
         )
-        r[f"{name}.VAL"] = val_pv
-        r[f"{name}"] = val_pv
 
-        # Get a Value out of SharedPV
+    
+        r[f"{name}"] = val_pv
+        r[f"{name}.VAL"] = val_pv
+
+
+        # Get a Value out of SharedPV (only for scalar non-enum, non-image)
         if desc["type"] != "enum" and not is_image:
             cur = nt.wrap(val_pv.current())
         else:
@@ -237,7 +268,7 @@ class SimServer(SimpleServer):
             if k in controls:
                 continue  # Skip special values
 
-            field = self._db_to_pv(k.lower())
+            field = self._db_to_pv(k.lower())  # (kept; even if unused elsewhere)
 
             # Determine any association with the "parent" (value) PV
             sub = self._pv_assoc(k)
@@ -259,18 +290,7 @@ class SimServer(SimpleServer):
 
         return r
 
-    def set_pv(self, name: str, value):
-        """
-        Update a PVA PV with a new value
 
-        Parameters
-        ----------
-        name : str
-            Full name of PV including field
-        value : Any
-            Value to set
-        """
-        self._pva[name].post(value, timestamp=time.time())
 
 
 class SimDriver(Driver):
@@ -395,6 +415,7 @@ class SimDriver(Driver):
             "REQ",
             "CTRL",
             "TMIT",
+            "STATCTRLSUB.T"
         ]
         key_list = [k for k in key_list if not any(flag in k for flag in ignore_flags)]
         
@@ -472,7 +493,8 @@ class SimDriver(Driver):
     def read(self, reason):
         # grab latest value from the cache
         value = self.cached_value(reason)
-
+        if 'STATCTRLSUB' in reason:
+            print(reason)
         try:
             self.setParam(reason, value)
         except Exception as e:
