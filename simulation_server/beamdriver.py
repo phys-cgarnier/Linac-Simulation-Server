@@ -196,7 +196,7 @@ class SimServer(SimpleServer):
         """
         Decide the Normative Type (NT) object + initial value for a PV record.
         Policy:
-         Assoc flag controls whether we include extra NT metadata (control/display/valueAlarm).
+        Assoc flag controls whether we include extra NT metadata (control/display/valueAlarm).
         """
 
         pv_type = desc.get("type", "float")
@@ -234,11 +234,40 @@ class SimServer(SimpleServer):
         raise Exception(f'Unhandled type "{pv_type}"')
 
 
+    def _build_pv(self, name: str,
+                  desc: dict,
+                  assoc: bool = False) -> Dict[str, SharedPV]:
+        """
+        Build one or more PVs corresponding to a record description.
 
-    def _build_pv(self, name: str, desc: dict, assoc: bool = True) -> Dict[str, SharedPV]:
+        This method always creates the primary value PV (``name`` / ``name.VAL``).
+        When ``assoc`` is enabled, it additionally creates associated field PVs
+        (e.g. ``name.FIELD``) and embeds those fields into the structured NT value
+        of the primary PV.
+
+        The ``assoc`` flag also controls the amount of metadata included in the
+        primary PV's Normative Type:
+        - ``assoc=False``: create a minimal NT with no control/display/alarm metadata
+        - ``assoc=True``: include control, display, and value-alarm metadata
+        It also controls if extra fields are created.
+        
+        Parameters
+        ----------
+        name : str
+            Base PV name.
+        desc : dict
+            Record description (pcaspy-style) defining type, default value, and fields.
+        assoc : bool, optional
+            If True, create associated field PVs and include full NT metadata.
+            If False, only create the primary PV with a minimal NT.
+
+        Returns
+        -------
+        Dict[str, SharedPV]
+            Mapping from PV name to SharedPV instance.
         """
-        Builds several PVs to form the record described by 'desc'
-        """
+
+
         r: Dict[str, SharedPV] = {}
 
         nt, default, is_image = self._build_nt(desc, assoc)
