@@ -191,47 +191,52 @@ class SimServer(SimpleServer):
         """
         self._pva[name].post(value, timestamp=time.time())
 
-
     def _build_nt(self, desc: dict, assoc: bool) -> Tuple[Any, Any, bool]:
         """
         Decide the Normative Type (NT) object + initial value for a PV record.
-        Policy:
-        Assoc flag controls whether we include extra NT metadata (control/display/valueAlarm).
+
+        Policy
+        ------
+        - `assoc` controls whether NT metadata (control/display/valueAlarm) is included.
+        - Image PVs are inferred from (count + n_col) fields.
         """
 
         pv_type = desc.get("type", "float")
-        desc["type"] = pv_type  # keep compat with code that reads desc["type"]
+        desc["type"] = pv_type  # keep compat with downstream code
 
         is_image = False
-
-        # decide metadata policy here
         meta = dict(control=assoc, display=assoc, valueAlarm=assoc)
 
-        if pv_type == "enum":
-            nt = NTEnum(**meta)
-            default = {
-                "index": desc["value"] if "value" in desc else 0,
-                "choices": desc["enums"],
-            }
-            return nt, default, is_image
+        match pv_type:
 
-        elif pv_type == "int":
-            nt = NTScalar("i", **meta)
-            default = desc["value"] if "value" in desc else 0
-            return nt, default, is_image
+            case "enum":
+                nt = NTEnum(**meta)
+                default = {
+                    "index": desc.get("value", 0),
+                    "choices": desc["enums"],
+                }
 
-        elif pv_type == "float":
-            # If we have count + n_col, it's actually an array (image)
-            if "count" in desc and "n_col" in desc:
-                default = np.zeros((desc["n_col"], desc["n_row"]), dtype=float)
-                nt = NTNDArray()  # NDArray doesn't use control/display/valueAlarm knobs
+            case "int":
+                nt = NTScalar("i", **meta)
+                default = desc.get("value", 0)
+
+            case "float" if "count" in desc and "n_col" in desc:
+                # Image / array case
+                nt = NTNDArray()
+                default = np.zeros(
+                    (desc["n_col"], desc["n_row"]),
+                    dtype=float,
+                )
                 is_image = True
-            else:
-                nt = NTScalar("d", **meta)
-                default = float(desc["value"]) if "value" in desc else 0.0
-            return nt, default, is_image
 
-        raise Exception(f'Unhandled type "{pv_type}"')
+            case "float":
+                nt = NTScalar("d", **meta)
+                default = float(desc.get("value", 0.0))
+
+            case _:
+                raise ValueError(f'Unhandled PV type "{pv_type}"')
+
+        return nt, default, is_image
 
 
     def _build_pv(self, name: str,
