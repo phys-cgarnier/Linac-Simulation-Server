@@ -82,7 +82,18 @@ def create_pvdb(
                     "unit": "um/px",
                 },
                 get_pv("target_control"): {"type": "enum", "enums": ["OUT", "IN"]},
+                f'{key}:XRMS': {
+                    "type": "float",
+                    "value": 0.0,
+                    "prec": 5,
+                },
+                f'{key}:YRMS': {
+                    "type": "float",
+                    "value": 0.0,
+                    "prec": 5,
+                },
             }
+
 
         elif "TCAV" in key:
             device_params= {
