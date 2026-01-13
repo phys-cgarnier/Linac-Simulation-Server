@@ -123,7 +123,9 @@ SCREEN_MAPPING = {
     "N_OF_ROW": FieldAccessor(lambda e, energy: e.resolution[0]),
     "N_OF_COL": FieldAccessor(lambda e, energy: e.resolution[1]),
     "XRMS": FieldAccessor(lambda e, energy: e.get_read_beam().sigma_x*1e6),
-    "YRMS": FieldAccessor(lambda e, energy: e.get_read_beam().sigma_y*1e6)
+    "YRMS": FieldAccessor(lambda e, energy: e.get_read_beam().sigma_y*1e6),
+    "X": FieldAccessor(lambda e, energy: e.get_read_beam().mu_x*1e6),
+    "Y": FieldAccessor(lambda e, energy: e.get_read_beam().mu_y*1e6),
 }
 
 

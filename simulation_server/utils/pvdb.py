@@ -92,6 +92,16 @@ def create_pvdb(
                     "value": 0.0,
                     "prec": 5,
                 },
+                f'{key}:X': {
+                    "type": "float",
+                    "value": 0.0,
+                    "prec": 5,
+                },
+                f'{key}:Y': {
+                    "type": "float",
+                    "value": 0.0,
+                    "prec": 5,
+                },
             }
 
 
