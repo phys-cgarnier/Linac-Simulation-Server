@@ -57,6 +57,10 @@ def create_pvdb(
                     "type": "enum",
                     "enums": ["Ready", "TRIM", "Perturb", "MORE_IF_NEEDED"],
                 },
+                f"{key}:STATCTRLSUB.T": {
+                    "type": "int",
+                    "value": 0
+                }
             }
 
         elif "OTRS" in key:
@@ -78,7 +82,28 @@ def create_pvdb(
                     "unit": "um/px",
                 },
                 get_pv("target_control"): {"type": "enum", "enums": ["OUT", "IN"]},
+                f'{key}:XRMS': {
+                    "type": "float",
+                    "value": 0.0,
+                    "prec": 5,
+                },
+                f'{key}:YRMS': {
+                    "type": "float",
+                    "value": 0.0,
+                    "prec": 5,
+                },
+                f'{key}:X': {
+                    "type": "float",
+                    "value": 0.0,
+                    "prec": 5,
+                },
+                f'{key}:Y': {
+                    "type": "float",
+                    "value": 0.0,
+                    "prec": 5,
+                },
             }
+
 
         elif "TCAV" in key:
             device_params= {

@@ -5,10 +5,11 @@ import numpy as np
 from p4p.server.thread import SharedPV
 from p4p.nt import NTScalar, NTNDArray, NTEnum
 import p4p
-from typing import Dict, Callable, Any
+from typing import Dict, Callable, Any, Tuple
 from simulation_server.virtual_accelerator import VirtualAccelerator
 import threading
 from .utils.timer import Timer
+import pprint
 
 class SimServer(SimpleServer):
     """
@@ -78,7 +79,7 @@ class SimServer(SimpleServer):
         self._callback = None
         self._db = pvdb
         self._threaded = threading
-
+        self.unassoc_pvs = ['STATCTRLSUB.T']
         # Add a PV to indicate both simulation status and to trigger simulation
         self.sim_pv_name = "VIRT:BEAM:SIMULATE"
         self._db[self.sim_pv_name] = {
@@ -94,10 +95,16 @@ class SimServer(SimpleServer):
 
         # Create PVA PVs
         for k, v in self._db.items():
-            if k.rfind(".") != -1:
+            # Get last field
+            s = k.rsplit(':', 1)[-1]
+            if s in self.unassoc_pvs:
+                self._pva.update(self._build_pv(f"{prefix}{k}", v, False))
+            elif k.rfind(".") != -1:
                 continue
-            self._pva.update(self._build_pv(f"{prefix}{k}", v))
-
+            else:
+               self._pva.update(self._build_pv(f"{prefix}{k}", v, True))
+        
+        
         self.sim_pv = self._pva[self.sim_pv_name]
 
         super().__init__()
@@ -171,94 +178,6 @@ class SimServer(SimpleServer):
         except:
             return None
 
-    def _build_pv(self, name: str, desc: dict) -> Dict[str, SharedPV]:
-        """
-        Builds several PVs to form the record described by 'desc'
-
-        Parameters
-        ----------
-        name : str
-            PV base name
-        desc : dict
-            Description ordinarily passed to pcaspy
-
-        Returns
-        -------
-        Dict[str, SharedPV]
-            Dict mapping PV name -> SharedPV instance
-        """
-        r = {}
-        if not "type" in desc:
-            desc["type"] = "float"
-
-        is_image = False
-        match desc["type"]:
-            case "enum":
-                nt = NTEnum(control=True, display=True, valueAlarm=True)
-                default = {
-                    "index": desc["value"] if "value" in desc else 0,
-                    "choices": desc["enums"],
-                }
-            case "int":
-                nt = NTScalar("i", control=True, display=True, valueAlarm=True)
-                default = desc["value"] if "value" in desc else 0
-            case "float":
-                # If we have count, it's actually an array (image)
-                if "count" in desc and "n_col" in desc:
-                    default = np.zeros((desc["n_col"], desc["n_row"]), dtype=float)
-                    nt = NTNDArray()
-                    is_image = True
-                else:
-                    nt = NTScalar("d", control=True, display=True, valueAlarm=True)
-                    default = float(desc["value"]) if "value" in desc else 0.0
-            case _:
-                raise Exception(f'Unhandled type "{desc["type"]}"')
-
-        # Special control fields and status fields
-        controls = ["enums", "type", "value", "count", "n_col", "n_row"]
-
-        # Add value field
-        val_pv = SharedPV(
-            nt=nt,
-            initial=default,
-            handler=SimServer.UpdateHandler(self),
-        )
-        r[f"{name}.VAL"] = val_pv
-        r[f"{name}"] = val_pv
-
-        # Get a Value out of SharedPV
-        if desc["type"] != "enum" and not is_image:
-            cur = nt.wrap(val_pv.current())
-        else:
-            cur = None
-
-        # Build generic fields
-        for k, v in desc.items():
-            if k in controls:
-                continue  # Skip special values
-
-            field = self._db_to_pv(k.lower())
-
-            # Determine any association with the "parent" (value) PV
-            sub = self._pv_assoc(k)
-            par_pv = val_pv if sub else None
-
-            # Build a PV for each field
-            r[f"{name}.{k.upper()}"] = SharedPV(
-                nt=NTScalar(self._type_desc(v)),
-                initial=v,
-                handler=SimServer.UpdateHandler(self, parent=par_pv, subfield=sub),
-            )
-
-            if sub and cur:
-                cur[sub] = v
-
-        # Post the "real" value to the value PV, including all fields
-        if cur:
-            val_pv.post(cur, timestamp=time.time())
-
-        return r
-
     def set_pv(self, name: str, value):
         """
         Update a PVA PV with a new value
@@ -271,6 +190,142 @@ class SimServer(SimpleServer):
             Value to set
         """
         self._pva[name].post(value, timestamp=time.time())
+
+    def _build_nt(self, desc: dict, assoc: bool) -> Tuple[Any, Any, bool]:
+        """
+        Decide the Normative Type (NT) object + initial value for a PV record.
+
+        Policy
+        ------
+        - `assoc` controls whether NT metadata (control/display/valueAlarm) is included.
+        - Image PVs are inferred from (count + n_col) fields.
+        """
+
+        pv_type = desc.get("type", "float")
+        desc["type"] = pv_type  # keep compat with downstream code
+
+        is_image = False
+        meta = dict(control=assoc, display=assoc, valueAlarm=assoc)
+
+        match pv_type:
+
+            case "enum":
+                nt = NTEnum(**meta)
+                default = {
+                    "index": desc.get("value", 0),
+                    "choices": desc["enums"],
+                }
+
+            case "int":
+                nt = NTScalar("i", **meta)
+                default = desc.get("value", 0)
+
+            case "float" if "count" in desc and "n_col" in desc:
+                # Image / array case
+                nt = NTNDArray()
+                default = np.zeros(
+                    (desc["n_col"], desc["n_row"]),
+                    dtype=float,
+                )
+                is_image = True
+
+            case "float":
+                nt = NTScalar("d", **meta)
+                default = float(desc.get("value", 0.0))
+
+            case _:
+                raise ValueError(f'Unhandled PV type "{pv_type}"')
+
+        return nt, default, is_image
+
+
+    def _build_pv(self, name: str,
+                  desc: dict,
+                  assoc: bool = False) -> Dict[str, SharedPV]:
+        """
+        Build one or more PVs corresponding to a record description.
+
+        This method always creates the primary value PV (``name`` / ``name.VAL``).
+        When ``assoc`` is enabled, it additionally creates associated field PVs
+        (e.g. ``name.FIELD``) and embeds those fields into the structured NT value
+        of the primary PV.
+
+        The ``assoc`` flag also controls the amount of metadata included in the
+        primary PV's Normative Type:
+        - ``assoc=False``: create a minimal NT with no control/display/alarm metadata
+        - ``assoc=True``: include control, display, and value-alarm metadata
+        It also controls if extra fields are created.
+        
+        Parameters
+        ----------
+        name : str
+            Base PV name.
+        desc : dict
+            Record description (pcaspy-style) defining type, default value, and fields.
+        assoc : bool, optional
+            If True, create associated field PVs and include full NT metadata.
+            If False, only create the primary PV with a minimal NT.
+
+        Returns
+        -------
+        Dict[str, SharedPV]
+            Mapping from PV name to SharedPV instance.
+        """
+
+
+        r: Dict[str, SharedPV] = {}
+
+        nt, default, is_image = self._build_nt(desc, assoc)
+
+        # Special control fields and status fields
+        controls = ["enums", "type", "value", "count", "n_col", "n_row"]
+
+        # Add value field
+        val_pv = SharedPV(
+            nt=nt,
+            initial=default,
+            handler=SimServer.UpdateHandler(self),
+        )
+
+    
+        r[f"{name}"] = val_pv
+        r[f"{name}.VAL"] = val_pv
+
+
+        # Get a Value out of SharedPV (only for scalar non-enum, non-image)
+        if desc["type"] != "enum" and not is_image:
+            cur = nt.wrap(val_pv.current())
+        else:
+            cur = None
+        if assoc:
+            # Build generic fields
+            for k, v in desc.items():
+                if k in controls:
+                    continue  # Skip special values
+
+                field = self._db_to_pv(k.lower())  # (kept; even if unused elsewhere)
+
+                # Determine any association with the "parent" (value) PV
+                sub = self._pv_assoc(k)
+                par_pv = val_pv if sub else None
+
+                # Build a PV for each field
+                r[f"{name}.{k.upper()}"] = SharedPV(
+                    nt=NTScalar(self._type_desc(v)),
+                    initial=v,
+                    handler=SimServer.UpdateHandler(self, parent=par_pv, subfield=sub),
+                )
+
+                if sub and cur:
+                    cur[sub] = v
+
+        # Post the "real" value to the value PV, including all fields
+        if cur:
+            val_pv.post(cur, timestamp=time.time())
+
+        return r
+
+
 
 
 class SimDriver(Driver):
@@ -395,6 +450,7 @@ class SimDriver(Driver):
             "REQ",
             "CTRL",
             "TMIT",
+            "STATCTRLSUB.T"
         ]
         key_list = [k for k in key_list if not any(flag in k for flag in ignore_flags)]
         
@@ -483,7 +539,7 @@ class SimDriver(Driver):
 
     def write(self, reason, value):
         """write to a PV, run the simulation, and then update all other PVs"""
-        print(f"Writing {value} to {reason}")
+        #print(f"Writing {value} to {reason}")
 
         # Update internal values quickly so readbacks dont fail
         self.set_cached_value(reason, value, True)
